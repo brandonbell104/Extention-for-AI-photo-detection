@@ -1,15 +1,15 @@
 // Load saved settings
 chrome.storage.sync.get(['enabled', 'analysisType', 'sensitivity', 'colorMap', 'opacity', 'gaussianSigma', 'showDebug'], (data) => {
-  document.getElementById('toggleAnalysis').checked = data.enabled || false;
-  document.getElementById('analysisType').value = data.analysisType || 'noise';
-  document.getElementById('sensitivity').value = data.sensitivity || 3;
-  document.getElementById('colorMap').value = data.colorMap || 'grayscale';
-  document.getElementById('opacity').value = data.opacity || 100;
-  document.getElementById('gaussianSigma').value = data.gaussianSigma || 12;
-  document.getElementById('showDebug').checked = data.showDebug || false;
-  document.getElementById('sensValue').textContent = `${data.sensitivity || 3}x`;
-  document.getElementById('opacityValue').textContent = `${data.opacity || 100}%`;
-  document.getElementById('sigmaValue').textContent = ((data.gaussianSigma || 12) / 10).toFixed(1);
+  document.getElementById('toggleAnalysis').checked = data.enabled ?? false;
+  document.getElementById('analysisType').value = data.analysisType ?? 'noise';
+  document.getElementById('sensitivity').value = data.sensitivity ?? 3;
+  document.getElementById('colorMap').value = data.colorMap ?? 'grayscale';
+  document.getElementById('opacity').value = data.opacity ?? 100;
+  document.getElementById('gaussianSigma').value = data.gaussianSigma ?? 12;
+  document.getElementById('showDebug').checked = data.showDebug ?? false;
+  document.getElementById('sensValue').textContent = `${data.sensitivity ?? 3}x`;
+  document.getElementById('opacityValue').textContent = `${data.opacity ?? 100}%`;
+  document.getElementById('sigmaValue').textContent = ((data.gaussianSigma ?? 12) / 10).toFixed(1);
   
   // Show/hide FFT controls
   document.getElementById('fftControls').style.display = 

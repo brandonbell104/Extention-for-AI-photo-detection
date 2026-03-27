@@ -12,13 +12,13 @@ let currentDisplayElement = null;
 
 // Load settings
 chrome.storage.sync.get(['enabled', 'analysisType', 'sensitivity', 'colorMap', 'opacity', 'gaussianSigma', 'showDebug'], (data) => {
-  isEnabled = data.enabled || false;
-  settings.analysisType = data.analysisType || 'noise';
-  settings.sensitivity = data.sensitivity || 3;
-  settings.colorMap = data.colorMap || 'grayscale';
-  settings.opacity = data.opacity || 100;
-  settings.gaussianSigma = (data.gaussianSigma || 12) / 10; // Convert back to 0.5-3.0 range
-  settings.showDebug = data.showDebug || false;
+  isEnabled = data.enabled ?? false;
+  settings.analysisType = data.analysisType ?? 'noise';
+  settings.sensitivity = data.sensitivity ?? 3;
+  settings.colorMap = data.colorMap ?? 'grayscale';
+  settings.opacity = data.opacity ?? 100;
+  settings.gaussianSigma = (data.gaussianSigma ?? 12) / 10; // Convert back to 0.5-3.0 range
+  settings.showDebug = data.showDebug ?? false;
   
   if (isEnabled) {
     enableAnalysis();
@@ -35,7 +35,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       disableAnalysis();
     }
   } else if (request.action === 'updateSettings') {
-    settings = { ...settings, ...request.settings };
+    const incoming = { ...request.settings };
+    // Convert gaussianSigma from slider value (5-30) to actual sigma (0.5-3.0)
+    if (incoming.gaussianSigma !== undefined) {
+      incoming.gaussianSigma = incoming.gaussianSigma / 10;
+    }
+    settings = { ...settings, ...incoming };
     // Reprocess the current image if one is being displayed
     if (currentImageData && currentDisplayElement) {
       reprocessCurrentImage();
@@ -105,23 +110,26 @@ function findImageElement(element) {
 }
 
 function handleImageClick(e) {
+  // Don't process clicks inside our own overlay
+  if (e.target.closest('#noise-analysis-overlay')) return;
+
   const imgElement = findImageElement(e.target);
-  
+
   // Only handle if we found an image element
   if (imgElement) {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (imgElement.tagName === 'IMG') {
       analyzeImage(imgElement);
     } else {
       // Handle background images
       analyzeBackgroundImage(imgElement);
     }
-    
+
     return false;
   }
-  
+
   // If not an image, let the click pass through normally
   return true;
 }
@@ -890,19 +898,14 @@ function createOverlay(targetElement, dataUrl) {
   overlay.appendChild(closeBtn);
   overlay.appendChild(label);
   
-  // Prevent clicks on overlay from propagating to page
+  // Prevent clicks on overlay from propagating to page,
+  // but let the close button handle its own clicks
   overlay.addEventListener('click', (e) => {
+    if (e.target.closest('.close-btn')) return;
     e.stopPropagation();
     e.preventDefault();
-  }, true);
-  
-  // But allow close button clicks to work
-  closeBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    removeOverlay();
-  }, true);
-  
+  });
+
   document.body.appendChild(overlay);
 }
 

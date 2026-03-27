@@ -1,14 +1,10 @@
 {
-  "manifest_version": 3,
+  "manifest_version": 2,
   "name": "Image Noise Pattern Analyzer",
   "version": "1.0",
   "description": "Visualizes sensor noise patterns in images to detect potential manipulation",
-  "permissions": ["activeTab", "storage", "sidePanel"],
-  "host_permissions": ["<all_urls>"],
-  "background": {
-    "service_worker": "background.js"
-  },
-  "action": {
+  "permissions": ["activeTab", "storage", "<all_urls>"],
+  "browser_action": {
     "default_icon": {
       "16": "icon16.png",
       "48": "icon48.png",
@@ -16,8 +12,17 @@
     },
     "default_title": "Open Image Noise Analyzer"
   },
-  "side_panel": {
-    "default_path": "sidepanel.html"
+  "sidebar_action": {
+    "default_panel": "sidepanel.html",
+    "default_title": "Image Noise Analyzer",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "background": {
+    "scripts": ["background_firefox.js"]
   },
   "content_scripts": [
     {
@@ -30,5 +35,11 @@
     "16": "icon16.png",
     "48": "icon48.png",
     "128": "icon128.png"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "noise-analyzer@your-domain.com",
+      "strict_min_version": "109.0"
+    }
   }
 }

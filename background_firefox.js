@@ -1,15 +1,16 @@
-// Open side panel when extension icon is clicked
-chrome.action.onClicked.addListener((tab) => {
-  chrome.sidePanel.open({ windowId: tab.windowId });
+// Firefox background script
+// Firefox uses sidebar_action which opens automatically via its own toolbar button.
+// When the browser_action icon is clicked, toggle the sidebar.
+browser.browserAction.onClicked.addListener(() => {
+  browser.sidebarAction.toggle();
 });
 
-// Background service worker to fetch images and bypass CORS
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+// Background script to fetch images and bypass CORS
+browser.runtime.onMessage.addListener((request, sender) => {
   if (request.action === 'fetchImage') {
-    fetchImageAsBase64(request.url)
-      .then(base64 => sendResponse({ success: true, data: base64 }))
-      .catch(error => sendResponse({ success: false, error: error.message }));
-    return true; // Keep channel open for async response
+    return fetchImageAsBase64(request.url)
+      .then(base64 => ({ success: true, data: base64 }))
+      .catch(error => ({ success: false, error: error.message }));
   }
 });
 
