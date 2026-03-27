@@ -1,0 +1,53 @@
+.noise-overlay {
+  position: absolute;
+  z-index: 999999;
+  border: 3px solid #2196F3;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  background: black;
+  pointer-events: auto;
+}
+
+.noise-overlay .close-btn {
+  position: absolute;
+  top: -15px;
+  right: -15px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #2196F3;
+  color: white;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  z-index: 1000001;
+  pointer-events: auto;
+}
+
+.noise-overlay .close-btn:hover {
+  background: #1976D2;
+  transform: scale(1.1);
+}
+
+.noise-analysis-highlight {
+  outline: 2px solid #2196F3 !important;
+  outline-offset: 2px;
+  cursor: crosshair !important;
+}
+
+.analysis-label {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background: rgba(33, 150, 243, 0.9);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  font-family: Arial, sans-serif;
+  pointer-events: none;
+}

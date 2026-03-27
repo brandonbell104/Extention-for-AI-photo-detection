@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      width: 300px;
+      padding: 15px;
+      font-family: Arial, sans-serif;
+      margin: 0;
+    }
+    h2 {
+      margin: 0 0 15px 0;
+      font-size: 16px;
+      color: #333;
+    }
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 15px;
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #2196F3;
+    }
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+    .controls {
+      margin-top: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 12px;
+      color: #666;
+    }
+    select, input[type="range"] {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    .value-display {
+      font-size: 11px;
+      color: #888;
+      text-align: right;
+    }
+    .info {
+      margin-top: 15px;
+      padding: 10px;
+      background: #f0f0f0;
+      border-radius: 4px;
+      font-size: 11px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <h2>Image Noise Analyzer</h2>
+  
+  <div class="toggle-container">
+    <span>Analysis Mode</span>
+    <label class="switch">
+      <input type="checkbox" id="toggleAnalysis">
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <div class="controls">
+    <label for="analysisType">Analysis Type:</label>
+    <select id="analysisType">
+      <option value="noise">Noise Pattern (High-pass)</option>
+      <option value="periodic">Periodic Patterns (AI Detection)</option>
+      <option value="fft">FFT Noise Analysis (Farid Method)</option>
+      <option value="ela">Error Level Analysis</option>
+      <option value="gradient">Gradient Magnitude</option>
+    </select>
+
+    <label for="sensitivity">Sensitivity: <span class="value-display" id="sensValue">3x</span></label>
+    <input type="range" id="sensitivity" min="1" max="10" value="3">
+
+    <label for="opacity">Opacity: <span class="value-display" id="opacityValue">100%</span></label>
+    <input type="range" id="opacity" min="0" max="100" value="100">
+
+    <div id="fftControls" style="display: none;">
+      <label for="gaussianSigma">Gaussian σ: <span class="value-display" id="sigmaValue">1.2</span></label>
+      <input type="range" id="gaussianSigma" min="5" max="30" value="12" step="1">
+      
+      <label>
+        <input type="checkbox" id="showDebug"> Show Debug Layers
+      </label>
+    </div>
+
+    <label for="colorMap">Color Map:</label>
+    <select id="colorMap">
+      <option value="grayscale">Grayscale</option>
+      <option value="heat">Heat Map</option>
+      <option value="rainbow">Rainbow</option>
+    </select>
+  </div>
+
+  <div class="info">
+    Click on any image on the page to analyze its noise pattern. Inconsistent patterns may indicate manipulation.
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
