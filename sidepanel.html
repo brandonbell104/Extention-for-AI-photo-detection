@@ -2,6 +2,7 @@
 <html>
 <head>
   <style>
+    * { box-sizing: border-box; }
     body {
       width: 100%;
       min-height: 100vh;
@@ -13,6 +14,11 @@
     h2 {
       margin: 0 0 15px 0;
       font-size: 16px;
+      color: #333;
+    }
+    h3 {
+      margin: 12px 0 8px 0;
+      font-size: 13px;
       color: #333;
     }
     .toggle-container {
@@ -79,7 +85,7 @@
     }
     select, input[type="range"] {
       width: 100%;
-      margin-bottom: 15px;
+      margin-bottom: 10px;
     }
     .value-display {
       font-size: 11px;
@@ -100,11 +106,156 @@
       padding-top: 10px;
       border-top: 1px solid #eee;
     }
+
+    /* Filter help text */
+    .filter-help {
+      background: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 10px;
+      margin: 8px 0 14px 0;
+      font-size: 11px;
+      line-height: 1.5;
+      color: #555;
+    }
+    .filter-help strong {
+      color: #333;
+      display: block;
+      margin-bottom: 4px;
+      font-size: 12px;
+    }
+    .filter-help .best-for {
+      display: inline-block;
+      background: #e8f5e9;
+      color: #2e7d32;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 10px;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+    .filter-help .look-for {
+      margin-top: 6px;
+      padding-top: 6px;
+      border-top: 1px solid #eee;
+    }
+    .filter-help .look-for span {
+      font-weight: bold;
+      color: #d32f2f;
+    }
+
+    /* Online checker section */
+    .checker-section {
+      margin-top: 15px;
+      padding: 15px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .checker-section h3 {
+      margin-top: 0;
+    }
+    .checker-btn {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      padding: 8px 12px;
+      margin-bottom: 6px;
+      background: #f5f5f5;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      text-align: left;
+      transition: background 0.2s;
+    }
+    .checker-btn:hover {
+      background: #e3f2fd;
+      border-color: #90caf9;
+    }
+    .checker-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .checker-btn .checker-icon {
+      width: 20px;
+      text-align: center;
+      margin-right: 8px;
+      font-size: 14px;
+    }
+    .checker-btn .checker-info {
+      flex: 1;
+    }
+    .checker-btn .checker-name {
+      font-weight: bold;
+      color: #333;
+    }
+    .checker-btn .checker-desc {
+      font-size: 10px;
+      color: #888;
+      margin-top: 2px;
+    }
+    .checker-btn .checker-arrow {
+      color: #999;
+      font-size: 14px;
+    }
+    .checker-note {
+      font-size: 10px;
+      color: #999;
+      margin-top: 8px;
+      font-style: italic;
+    }
+    .no-image-msg {
+      font-size: 11px;
+      color: #999;
+      text-align: center;
+      padding: 10px;
+    }
+
+    /* Watermark info section */
+    .watermark-info {
+      margin-top: 15px;
+      padding: 15px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .watermark-info h3 {
+      margin-top: 0;
+    }
+    .wm-entry {
+      padding: 6px 0;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 11px;
+      line-height: 1.4;
+    }
+    .wm-entry:last-child { border-bottom: none; }
+    .wm-entry .wm-name {
+      font-weight: bold;
+      color: #333;
+    }
+    .wm-entry .wm-by {
+      color: #888;
+      font-size: 10px;
+    }
+    .wm-entry .wm-detail {
+      color: #666;
+      margin-top: 2px;
+    }
+    .wm-tag {
+      display: inline-block;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 9px;
+      font-weight: bold;
+    }
+    .wm-tag.public { background: #e8f5e9; color: #2e7d32; }
+    .wm-tag.no-public { background: #fff3e0; color: #e65100; }
   </style>
 </head>
 <body>
-  <h2>🔬 Image Noise Analyzer</h2>
-  
+  <h2>Image Noise Analyzer</h2>
+
   <div class="toggle-container">
     <span><strong>Analysis Mode</strong></span>
     <label class="switch">
@@ -119,9 +270,14 @@
       <option value="noise">Noise Pattern (High-pass)</option>
       <option value="periodic">Periodic Patterns (AI Detection)</option>
       <option value="fft">FFT Noise Analysis (Farid Method)</option>
-      <option value="ela">Error Level Analysis</option>
+      <option value="ela">Error Level Analysis (ELA)</option>
       <option value="gradient">Gradient Magnitude</option>
     </select>
+
+    <!-- Dynamic help text for selected filter -->
+    <div id="filterHelp" class="filter-help">
+      <!-- Populated by JS -->
+    </div>
 
     <label for="sensitivity">Sensitivity: <span class="value-display" id="sensValue">3x</span></label>
     <input type="range" id="sensitivity" min="1" max="10" value="3">
@@ -130,11 +286,11 @@
     <input type="range" id="opacity" min="0" max="100" value="100">
 
     <div id="fftControls" style="display: none;">
-      <label for="gaussianSigma">Gaussian σ: <span class="value-display" id="sigmaValue">1.2</span></label>
+      <label for="gaussianSigma">Gaussian sigma: <span class="value-display" id="sigmaValue">1.2</span></label>
       <input type="range" id="gaussianSigma" min="5" max="30" value="12" step="1">
-      
+
       <label style="display: flex; align-items: center; margin-top: 10px;">
-        <input type="checkbox" id="showDebug" style="width: auto; margin-right: 8px;"> 
+        <input type="checkbox" id="showDebug" style="width: auto; margin-right: 8px;">
         Show Debug Layers
       </label>
     </div>
@@ -147,8 +303,102 @@
     </select>
   </div>
 
-  <div class="info">
-    💡 <strong>Tip:</strong> Click on any image on the page to analyze its noise pattern. The overlay stays visible while you adjust settings!
+  <!-- Online AI Detection Checkers -->
+  <div class="checker-section">
+    <h3>Check Image Online</h3>
+    <p id="checkerStatus" class="no-image-msg">Click an image on the page first, then use these buttons to check it with online AI detectors.</p>
+
+    <button class="checker-btn" id="checkC2PA" title="Checks for Content Credentials metadata embedded by cameras and AI tools">
+      <span class="checker-icon">&#128274;</span>
+      <span class="checker-info">
+        <span class="checker-name">Content Credentials (C2PA)</span>
+        <span class="checker-desc">Checks provenance metadata from cameras, Adobe, OpenAI, Google</span>
+      </span>
+      <span class="checker-arrow">&#8594;</span>
+    </button>
+
+    <button class="checker-btn" id="checkHive" title="AI-trained classifier that detects AI-generated images">
+      <span class="checker-icon">&#129302;</span>
+      <span class="checker-info">
+        <span class="checker-name">Hive AI Detector</span>
+        <span class="checker-desc">ML-based detection - works on DALL-E, Midjourney, Stable Diffusion</span>
+      </span>
+      <span class="checker-arrow">&#8594;</span>
+    </button>
+
+    <button class="checker-btn" id="checkAIOrNot" title="Free AI image detection tool">
+      <span class="checker-icon">&#128269;</span>
+      <span class="checker-info">
+        <span class="checker-name">AI or Not</span>
+        <span class="checker-desc">Free detector - also checks for C2PA watermarks</span>
+      </span>
+      <span class="checker-arrow">&#8594;</span>
+    </button>
+
+    <button class="checker-btn" id="checkIlluminarty" title="Detailed AI analysis with probability scores">
+      <span class="checker-icon">&#128161;</span>
+      <span class="checker-info">
+        <span class="checker-name">Illuminarty</span>
+        <span class="checker-desc">Detailed probability breakdown by AI model type</span>
+      </span>
+      <span class="checker-arrow">&#8594;</span>
+    </button>
+
+    <button class="checker-btn" id="checkSightEngine" title="Content moderation and AI detection API">
+      <span class="checker-icon">&#128065;</span>
+      <span class="checker-info">
+        <span class="checker-name">SightEngine</span>
+        <span class="checker-desc">AI-generated image detection with confidence scores</span>
+      </span>
+      <span class="checker-arrow">&#8594;</span>
+    </button>
+
+    <p class="checker-note">These open the service in a new tab. You may need to upload the image manually on some sites.</p>
+  </div>
+
+  <!-- Known AI Watermark Systems -->
+  <div class="watermark-info">
+    <h3>Known Invisible AI Watermarks</h3>
+
+    <div class="wm-entry">
+      <span class="wm-name">SynthID</span> <span class="wm-by">by Google DeepMind</span>
+      <span class="wm-tag no-public">No public detector</span>
+      <div class="wm-detail">Embedded in images from Google Imagen, Gemini, and Veo. Imperceptible pixel-level watermark that survives cropping, compression, and filters. Only Google can verify it internally.</div>
+    </div>
+
+    <div class="wm-entry">
+      <span class="wm-name">Content Credentials (C2PA)</span> <span class="wm-by">by Adobe / CAI Coalition</span>
+      <span class="wm-tag public">Public verifier</span>
+      <div class="wm-detail">Metadata-based provenance standard used by Adobe Firefly, OpenAI DALL-E 3, Microsoft Designer, Leica cameras, and others. Verifiable at contentcredentials.org/verify. Not a pixel watermark -- it's cryptographically signed metadata that can be stripped.</div>
+    </div>
+
+    <div class="wm-entry">
+      <span class="wm-name">Stable Signature</span> <span class="wm-by">by Meta</span>
+      <span class="wm-tag no-public">No public detector</span>
+      <div class="wm-detail">Invisible watermark trained into the Stable Diffusion decoder. Survives JPEG compression, cropping, and brightness changes. No public verification tool available.</div>
+    </div>
+
+    <div class="wm-entry">
+      <span class="wm-name">DALL-E Metadata</span> <span class="wm-by">by OpenAI</span>
+      <span class="wm-tag public">C2PA verifiable</span>
+      <div class="wm-detail">DALL-E 3 and ChatGPT images include C2PA Content Credentials. Also adds a visible colored stripe (which can be cropped). Verify via C2PA checker above.</div>
+    </div>
+
+    <div class="wm-entry">
+      <span class="wm-name">PhotoDNA</span> <span class="wm-by">by Microsoft</span>
+      <span class="wm-tag no-public">Law enforcement only</span>
+      <div class="wm-detail">Perceptual hash-based system primarily used for CSAM detection. Not an AI watermark, but used for image identification. Not publicly accessible.</div>
+    </div>
+
+    <div class="wm-entry">
+      <span class="wm-name">Digimarc</span> <span class="wm-by">by Digimarc Corp</span>
+      <span class="wm-tag no-public">Enterprise only</span>
+      <div class="wm-detail">Commercial invisible watermarking used by stock photo agencies and publishers. Survives print and scan. Enterprise licensing required for detection.</div>
+    </div>
+  </div>
+
+  <div class="info" style="margin-top: 15px;">
+    <strong>How to use:</strong> Toggle Analysis Mode on, then click any image on the page. The overlay appears with your selected filter. Adjust settings here in real-time -- the overlay updates live. Use the online checkers above for a second opinion.
   </div>
 
   <script src="popup.js"></script>

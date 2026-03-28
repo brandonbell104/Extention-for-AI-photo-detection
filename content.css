@@ -51,3 +51,24 @@
   font-family: Arial, sans-serif;
   pointer-events: none;
 }
+
+.noise-overlay .check-online-btn {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(46, 125, 50, 0.9);
+  color: white;
+  border: none;
+  padding: 5px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  font-family: Arial, sans-serif;
+  cursor: pointer;
+  z-index: 1000001;
+  pointer-events: auto;
+}
+
+.noise-overlay .check-online-btn:hover {
+  background: rgba(27, 94, 32, 0.95);
+}

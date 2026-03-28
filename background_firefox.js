@@ -1,16 +1,27 @@
 // Firefox background script
-// Firefox uses sidebar_action which opens automatically via its own toolbar button.
-// When the browser_action icon is clicked, toggle the sidebar.
+// Toggle the sidebar when the browser action icon is clicked
 browser.browserAction.onClicked.addListener(() => {
   browser.sidebarAction.toggle();
 });
 
-// Background script to fetch images and bypass CORS
+// Handle messages from content script and sidebar
 browser.runtime.onMessage.addListener((request, sender) => {
   if (request.action === 'fetchImage') {
+    // Fetch images via background to bypass CORS
     return fetchImageAsBase64(request.url)
       .then(base64 => ({ success: true, data: base64 }))
       .catch(error => ({ success: false, error: error.message }));
+  }
+
+  if (request.action === 'openChecker') {
+    browser.tabs.create({ url: request.url });
+    return;
+  }
+
+  // Relay messages from content script to sidebar
+  if (request.action === 'imageAnalyzed' || request.action === 'overlayRemoved') {
+    browser.runtime.sendMessage(request).catch(() => {});
+    return;
   }
 });
 

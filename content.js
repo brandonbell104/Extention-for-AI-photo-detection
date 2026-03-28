@@ -845,20 +845,26 @@ function createOverlay(targetElement, dataUrl) {
   const overlay = document.createElement('div');
   overlay.id = 'noise-analysis-overlay';
   overlay.className = 'noise-overlay';
-  
+
   const rect = targetElement.getBoundingClientRect();
   overlay.style.left = rect.left + window.scrollX + 'px';
   overlay.style.top = rect.top + window.scrollY + 'px';
   overlay.style.width = rect.width + 'px';
   overlay.style.height = rect.height + 'px';
-  
+
   // Original image (bottom layer)
   const originalImg = document.createElement('img');
+  let sourceImageUrl = '';
   if (targetElement.tagName === 'IMG') {
     originalImg.src = targetElement.src;
+    sourceImageUrl = targetElement.src;
   } else {
-    // For background images, we'll skip showing original
+    // For background images, extract URL
     originalImg.style.display = 'none';
+    const computed = window.getComputedStyle(targetElement);
+    const bgImage = computed.backgroundImage || targetElement.style.backgroundImage;
+    const urlMatch = bgImage && bgImage.match(/url\(['"]?([^'"()]+)['"]?\)/);
+    if (urlMatch) sourceImageUrl = urlMatch[1];
   }
   originalImg.style.position = 'absolute';
   originalImg.style.top = '0';
@@ -866,7 +872,7 @@ function createOverlay(targetElement, dataUrl) {
   originalImg.style.width = '100%';
   originalImg.style.height = '100%';
   originalImg.style.objectFit = 'contain';
-  
+
   // Analysis image (top layer with opacity)
   const analysisImg = document.createElement('img');
   analysisImg.src = dataUrl;
@@ -877,9 +883,9 @@ function createOverlay(targetElement, dataUrl) {
   analysisImg.style.height = '100%';
   analysisImg.style.objectFit = 'contain';
   analysisImg.style.opacity = settings.opacity / 100;
-  
+
   const closeBtn = document.createElement('button');
-  closeBtn.textContent = '×';
+  closeBtn.textContent = '\u00d7';
   closeBtn.className = 'close-btn';
   closeBtn.onclick = (e) => {
     e.preventDefault();
@@ -888,25 +894,46 @@ function createOverlay(targetElement, dataUrl) {
     removeOverlay();
     return false;
   };
-  
+
   const label = document.createElement('div');
   label.className = 'analysis-label';
   label.textContent = `${settings.analysisType.toUpperCase()} Analysis (${settings.sensitivity}x)`;
-  
+
+  // "Check Online" button on the overlay
+  const checkBtn = document.createElement('button');
+  checkBtn.textContent = 'Check Online';
+  checkBtn.className = 'check-online-btn';
+  checkBtn.onclick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Open C2PA Content Credentials verifier (the most useful public checker)
+    chrome.runtime.sendMessage({
+      action: 'openChecker',
+      url: 'https://contentcredentials.org/verify'
+    });
+  };
+
   overlay.appendChild(originalImg);
   overlay.appendChild(analysisImg);
   overlay.appendChild(closeBtn);
+  overlay.appendChild(checkBtn);
   overlay.appendChild(label);
-  
+
   // Prevent clicks on overlay from propagating to page,
-  // but let the close button handle its own clicks
+  // but let buttons handle their own clicks
   overlay.addEventListener('click', (e) => {
-    if (e.target.closest('.close-btn')) return;
+    if (e.target.closest('.close-btn') || e.target.closest('.check-online-btn')) return;
     e.stopPropagation();
     e.preventDefault();
   });
 
   document.body.appendChild(overlay);
+
+  // Notify side panel that an image was analyzed
+  chrome.runtime.sendMessage({
+    action: 'imageAnalyzed',
+    imageUrl: sourceImageUrl
+  }).catch(() => {}); // Ignore if no listener
 }
 
 function removeOverlay() {
@@ -917,4 +944,7 @@ function removeOverlay() {
   // Clear stored data when overlay is removed
   currentImageData = null;
   currentDisplayElement = null;
+
+  // Notify side panel
+  chrome.runtime.sendMessage({ action: 'overlayRemoved' }).catch(() => {});
 }
