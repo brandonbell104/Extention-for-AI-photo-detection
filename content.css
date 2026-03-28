@@ -1,74 +1,137 @@
+/* ============================================
+   RETRO CRT OVERLAY THEME
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap');
+
 .noise-overlay {
   position: absolute;
   z-index: 999999;
-  border: 3px solid #2196F3;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-  background: black;
+  border: 2px solid #33ff33;
+  box-shadow:
+    0 0 15px rgba(51, 255, 51, 0.3),
+    0 0 30px rgba(51, 255, 51, 0.1),
+    inset 0 0 15px rgba(0, 0, 0, 0.5);
+  background: #0a0a0a;
   pointer-events: auto;
 }
 
+/* Scanline effect on overlay */
+.noise-overlay::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(0, 0, 0, 0.08) 3px,
+    rgba(0, 0, 0, 0.08) 6px
+  );
+  pointer-events: none;
+  z-index: 1000000;
+}
+
+/* Close button — retro square style */
 .noise-overlay .close-btn {
   position: absolute;
-  top: -15px;
-  right: -15px;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: #2196F3;
-  color: white;
-  border: none;
-  font-size: 20px;
+  top: -12px;
+  right: -12px;
+  width: 26px;
+  height: 26px;
+  border-radius: 0;
+  background: #0a0a0a;
+  color: #ff4444;
+  border: 2px solid #ff4444;
+  font-size: 16px;
+  font-family: 'VT323', 'Courier New', monospace;
+  font-weight: bold;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 8px rgba(255, 68, 68, 0.4);
   z-index: 1000001;
   pointer-events: auto;
+  transition: all 0.15s;
 }
 
 .noise-overlay .close-btn:hover {
-  background: #1976D2;
-  transform: scale(1.1);
+  background: #ff4444;
+  color: #0a0a0a;
+  box-shadow: 0 0 12px rgba(255, 68, 68, 0.6);
+  transform: none;
 }
 
+/* Highlight on hoverable images */
 .noise-analysis-highlight {
-  outline: 2px solid #2196F3 !important;
+  outline: 2px solid #33ff33 !important;
   outline-offset: 2px;
   cursor: crosshair !important;
+  box-shadow: 0 0 10px rgba(51, 255, 51, 0.2) !important;
 }
 
+/* Analysis label — bottom left */
 .analysis-label {
   position: absolute;
-  bottom: 10px;
-  left: 10px;
-  background: rgba(33, 150, 243, 0.9);
-  color: white;
-  padding: 5px 10px;
-  border-radius: 4px;
-  font-size: 12px;
+  bottom: 8px;
+  left: 8px;
+  background: rgba(10, 10, 10, 0.85);
+  color: #33ff33;
+  padding: 4px 10px;
+  border: 1px solid #1a9f1a;
+  font-size: 11px;
   font-weight: bold;
-  font-family: Arial, sans-serif;
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-shadow: 0 0 6px rgba(51, 255, 51, 0.4);
   pointer-events: none;
+  z-index: 1000001;
+}
+.analysis-label::before {
+  content: '> ';
+  color: #1a9f1a;
 }
 
+/* Check Online button — bottom right */
 .noise-overlay .check-online-btn {
   position: absolute;
-  bottom: 10px;
-  right: 10px;
-  background: rgba(46, 125, 50, 0.9);
-  color: white;
-  border: none;
-  padding: 5px 12px;
-  border-radius: 4px;
-  font-size: 12px;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(10, 10, 10, 0.85);
+  color: #ffb800;
+  border: 1px solid #996e00;
+  padding: 4px 10px;
+  font-size: 11px;
   font-weight: bold;
-  font-family: Arial, sans-serif;
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  letter-spacing: 1px;
+  text-transform: uppercase;
   cursor: pointer;
   z-index: 1000001;
   pointer-events: auto;
+  transition: all 0.15s;
 }
 
 .noise-overlay .check-online-btn:hover {
-  background: rgba(27, 94, 32, 0.95);
+  background: #ffb800;
+  color: #0a0a0a;
+  box-shadow: 0 0 10px rgba(255, 184, 0, 0.4);
+}
+
+/* Loading indicator */
+.noise-loading {
+  font-family: 'VT323', 'Courier New', monospace !important;
+  background: rgba(10, 10, 10, 0.95) !important;
+  color: #33ff33 !important;
+  border: 2px solid #33ff33 !important;
+  border-radius: 0 !important;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(51, 255, 51, 0.4);
+  box-shadow: 0 0 20px rgba(51, 255, 51, 0.2);
 }

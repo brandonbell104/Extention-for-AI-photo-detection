@@ -162,15 +162,12 @@ function loadImageViaBackground(url, displayElement) {
   // Show loading indicator
   const loader = document.createElement('div');
   loader.className = 'noise-loading';
-  loader.textContent = 'Analyzing...';
+  loader.textContent = '> ANALYZING TARGET...';
   loader.style.position = 'fixed';
   loader.style.top = '50%';
   loader.style.left = '50%';
   loader.style.transform = 'translate(-50%, -50%)';
-  loader.style.background = 'rgba(33, 150, 243, 0.9)';
-  loader.style.color = 'white';
   loader.style.padding = '20px 40px';
-  loader.style.borderRadius = '8px';
   loader.style.zIndex = '9999999';
   loader.style.fontSize = '16px';
   loader.style.fontFamily = 'Arial, sans-serif';

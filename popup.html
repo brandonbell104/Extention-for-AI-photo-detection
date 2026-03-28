@@ -2,95 +2,195 @@
 <html>
 <head>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap');
+
+    :root {
+      --green: #33ff33;
+      --green-dim: #1a9f1a;
+      --green-dark: #0d4f0d;
+      --green-glow: rgba(51, 255, 51, 0.15);
+      --amber: #ffb800;
+      --bg: #0a0a0a;
+      --bg-panel: #0f1a0f;
+      --bg-input: #0a140a;
+      --border: #1a3a1a;
+      --text: #33ff33;
+      --text-dim: #1a9f1a;
+    }
+
+    * { box-sizing: border-box; }
+
     body {
       width: 300px;
-      padding: 15px;
-      font-family: Arial, sans-serif;
+      padding: 12px;
+      font-family: 'Share Tech Mono', 'Courier New', monospace;
       margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 12px;
+      position: relative;
     }
+
+    /* Scanlines */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: repeating-linear-gradient(
+        0deg, transparent, transparent 2px,
+        rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+
     h2 {
-      margin: 0 0 15px 0;
-      font-size: 16px;
-      color: #333;
+      margin: 0 0 10px 0;
+      font-family: 'VT323', monospace;
+      font-size: 20px;
+      color: var(--green);
+      text-shadow: 0 0 10px var(--green-glow);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 6px;
     }
+    h2::before { content: '> '; color: var(--green-dim); }
+
     .toggle-container {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 15px;
+      margin-bottom: 10px;
+      padding: 8px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
     }
+    .toggle-container span {
+      color: var(--green);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 11px;
+    }
+
     .switch {
       position: relative;
       display: inline-block;
-      width: 50px;
+      width: 52px;
       height: 24px;
     }
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
+    .switch input { opacity: 0; width: 0; height: 0; }
     .slider {
       position: absolute;
       cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #ccc;
-      transition: .4s;
-      border-radius: 24px;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #1a1a1a;
+      border: 1px solid #333;
+      transition: .3s;
     }
     .slider:before {
       position: absolute;
       content: "";
-      height: 18px;
-      width: 18px;
+      height: 16px;
+      width: 16px;
       left: 3px;
       bottom: 3px;
-      background-color: white;
-      transition: .4s;
-      border-radius: 50%;
+      background-color: #555;
+      transition: .3s;
     }
     input:checked + .slider {
-      background-color: #2196F3;
+      background-color: var(--green-dark);
+      border-color: var(--green-dim);
+      box-shadow: 0 0 8px var(--green-glow);
     }
     input:checked + .slider:before {
-      transform: translateX(26px);
+      transform: translateX(28px);
+      background-color: var(--green);
+      box-shadow: 0 0 6px var(--green);
     }
+
     .controls {
-      margin-top: 15px;
+      margin-top: 10px;
+      padding: 10px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
     }
+
     label {
       display: block;
-      margin-bottom: 5px;
-      font-size: 12px;
-      color: #666;
+      margin-bottom: 4px;
+      font-size: 11px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
-    select, input[type="range"] {
+
+    select {
       width: 100%;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
+      padding: 5px 6px;
+      background: var(--bg-input);
+      color: var(--green);
+      border: 1px solid var(--border);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      cursor: pointer;
+      outline: none;
     }
+    select:focus {
+      border-color: var(--green-dim);
+      box-shadow: 0 0 6px var(--green-glow);
+    }
+    select option { background: var(--bg); color: var(--green); }
+
+    input[type="range"] {
+      width: 100%;
+      margin-bottom: 8px;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 6px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px; height: 12px;
+      background: var(--green);
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 0 6px var(--green);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 12px; height: 12px;
+      background: var(--green);
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 0 6px var(--green);
+    }
+
     .value-display {
       font-size: 11px;
-      color: #888;
-      text-align: right;
+      color: var(--amber);
     }
+
+    input[type="checkbox"] { accent-color: var(--green); }
+
     .info {
-      margin-top: 15px;
-      padding: 10px;
-      background: #f0f0f0;
-      border-radius: 4px;
-      font-size: 11px;
-      color: #666;
+      margin-top: 10px;
+      padding: 8px;
+      background: var(--bg-panel);
+      border-left: 2px solid var(--green-dim);
+      font-size: 10px;
+      color: var(--text-dim);
     }
   </style>
 </head>
 <body>
-  <h2>Image Noise Analyzer</h2>
-  
+  <h2>NOISE ANALYZER</h2>
+
   <div class="toggle-container">
-    <span>Analysis Mode</span>
+    <span>[ANALYSIS MODE]</span>
     <label class="switch">
       <input type="checkbox" id="toggleAnalysis">
       <span class="slider"></span>
@@ -98,40 +198,40 @@
   </div>
 
   <div class="controls">
-    <label for="analysisType">Analysis Type:</label>
+    <label for="analysisType">&gt; Analysis Type:</label>
     <select id="analysisType">
-      <option value="noise">Noise Pattern (High-pass)</option>
-      <option value="periodic">Periodic Patterns (AI Detection)</option>
-      <option value="fft">FFT Noise Analysis (Farid Method)</option>
-      <option value="ela">Error Level Analysis</option>
-      <option value="gradient">Gradient Magnitude</option>
+      <option value="noise">NOISE PATTERN (HIGH-PASS)</option>
+      <option value="periodic">PERIODIC PATTERNS (AI DETECT)</option>
+      <option value="fft">FFT ANALYSIS (FARID METHOD)</option>
+      <option value="ela">ERROR LEVEL ANALYSIS</option>
+      <option value="gradient">GRADIENT MAGNITUDE</option>
     </select>
 
-    <label for="sensitivity">Sensitivity: <span class="value-display" id="sensValue">3x</span></label>
+    <label for="sensitivity">&gt; Sensitivity: <span class="value-display" id="sensValue">3x</span></label>
     <input type="range" id="sensitivity" min="1" max="10" value="3">
 
-    <label for="opacity">Opacity: <span class="value-display" id="opacityValue">100%</span></label>
+    <label for="opacity">&gt; Opacity: <span class="value-display" id="opacityValue">100%</span></label>
     <input type="range" id="opacity" min="0" max="100" value="100">
 
     <div id="fftControls" style="display: none;">
-      <label for="gaussianSigma">Gaussian σ: <span class="value-display" id="sigmaValue">1.2</span></label>
+      <label for="gaussianSigma">&gt; Gaussian sigma: <span class="value-display" id="sigmaValue">1.2</span></label>
       <input type="range" id="gaussianSigma" min="5" max="30" value="12" step="1">
-      
+
       <label>
         <input type="checkbox" id="showDebug"> Show Debug Layers
       </label>
     </div>
 
-    <label for="colorMap">Color Map:</label>
+    <label for="colorMap">&gt; Color Map:</label>
     <select id="colorMap">
-      <option value="grayscale">Grayscale</option>
-      <option value="heat">Heat Map</option>
-      <option value="rainbow">Rainbow</option>
+      <option value="grayscale">GRAYSCALE</option>
+      <option value="heat">HEAT MAP</option>
+      <option value="rainbow">RAINBOW</option>
     </select>
   </div>
 
   <div class="info">
-    Click on any image on the page to analyze its noise pattern. Inconsistent patterns may indicate manipulation.
+    Click any image to analyze. Use the side panel for full controls and AI checkers.
   </div>
 
   <script src="popup.js"></script>

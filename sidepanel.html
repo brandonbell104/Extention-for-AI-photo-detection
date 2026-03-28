@@ -2,262 +2,421 @@
 <html>
 <head>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap');
+
+    :root {
+      --green: #33ff33;
+      --green-dim: #1a9f1a;
+      --green-dark: #0d4f0d;
+      --green-glow: rgba(51, 255, 51, 0.15);
+      --amber: #ffb800;
+      --amber-dim: #996e00;
+      --red: #ff4444;
+      --red-dim: #661a1a;
+      --bg: #0a0a0a;
+      --bg-panel: #0f1a0f;
+      --bg-input: #0a140a;
+      --border: #1a3a1a;
+      --text: #33ff33;
+      --text-dim: #1a9f1a;
+    }
+
     * { box-sizing: border-box; }
+
     body {
       width: 100%;
       min-height: 100vh;
-      padding: 15px;
-      font-family: Arial, sans-serif;
+      padding: 12px;
+      font-family: 'Share Tech Mono', 'Courier New', monospace;
       margin: 0;
-      background: #f5f5f5;
-    }
-    h2 {
-      margin: 0 0 15px 0;
-      font-size: 16px;
-      color: #333;
-    }
-    h3 {
-      margin: 12px 0 8px 0;
-      font-size: 13px;
-      color: #333;
-    }
-    .toggle-container {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 15px;
-      padding: 10px;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-    .switch {
+      background: var(--bg);
+      color: var(--text);
+      font-size: 12px;
+      line-height: 1.5;
       position: relative;
-      display: inline-block;
-      width: 50px;
-      height: 24px;
     }
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-    .slider {
-      position: absolute;
-      cursor: pointer;
+
+    /* CRT scanline overlay */
+    body::before {
+      content: '';
+      position: fixed;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      background-color: #ccc;
-      transition: .4s;
-      border-radius: 24px;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.15) 2px,
+        rgba(0, 0, 0, 0.15) 4px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* CRT vignette */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.4) 100%);
+      pointer-events: none;
+      z-index: 9998;
+    }
+
+    h2 {
+      margin: 0 0 12px 0;
+      font-family: 'VT323', monospace;
+      font-size: 22px;
+      color: var(--green);
+      text-shadow: 0 0 10px var(--green-glow), 0 0 20px var(--green-glow);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+    h2::before {
+      content: '> ';
+      color: var(--green-dim);
+    }
+
+    h3 {
+      margin: 10px 0 6px 0;
+      font-family: 'VT323', monospace;
+      font-size: 16px;
+      color: var(--amber);
+      text-shadow: 0 0 8px rgba(255, 184, 0, 0.2);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    h3::before {
+      content: '// ';
+      color: var(--amber-dim);
+    }
+
+    /* Toggle section */
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding: 10px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+    }
+    .toggle-container span {
+      color: var(--green);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 12px;
+    }
+
+    /* Retro toggle switch */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 52px;
+      height: 24px;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #1a1a1a;
+      border: 1px solid #333;
+      transition: .3s;
     }
     .slider:before {
       position: absolute;
       content: "";
-      height: 18px;
-      width: 18px;
+      height: 16px;
+      width: 16px;
       left: 3px;
       bottom: 3px;
-      background-color: white;
-      transition: .4s;
-      border-radius: 50%;
+      background-color: #555;
+      transition: .3s;
     }
     input:checked + .slider {
-      background-color: #2196F3;
+      background-color: var(--green-dark);
+      border-color: var(--green-dim);
+      box-shadow: 0 0 8px var(--green-glow), inset 0 0 8px var(--green-glow);
     }
     input:checked + .slider:before {
-      transform: translateX(26px);
+      transform: translateX(28px);
+      background-color: var(--green);
+      box-shadow: 0 0 6px var(--green);
     }
+
+    /* Controls panel */
     .controls {
-      margin-top: 15px;
-      padding: 15px;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin-top: 12px;
+      padding: 12px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
     }
+
     label {
       display: block;
-      margin-bottom: 5px;
-      font-size: 12px;
-      color: #666;
+      margin-bottom: 4px;
+      font-size: 11px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
-    select, input[type="range"] {
+
+    select {
       width: 100%;
       margin-bottom: 10px;
+      padding: 6px 8px;
+      background: var(--bg-input);
+      color: var(--green);
+      border: 1px solid var(--border);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      cursor: pointer;
+      outline: none;
     }
+    select:focus {
+      border-color: var(--green-dim);
+      box-shadow: 0 0 6px var(--green-glow);
+    }
+    select option {
+      background: var(--bg);
+      color: var(--green);
+    }
+
+    /* Retro range slider */
+    input[type="range"] {
+      width: 100%;
+      margin-bottom: 10px;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 6px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      background: var(--green);
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 0 6px var(--green);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      background: var(--green);
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 0 6px var(--green);
+    }
+
     .value-display {
       font-size: 11px;
-      color: #888;
-      text-align: right;
+      color: var(--amber);
+      text-shadow: 0 0 4px rgba(255, 184, 0, 0.3);
     }
+
+    /* Checkbox retro style */
+    input[type="checkbox"] {
+      accent-color: var(--green);
+    }
+
     .info {
-      margin-top: 15px;
+      margin-top: 12px;
       padding: 10px;
-      background: #e3f2fd;
-      border-radius: 4px;
+      background: var(--bg-panel);
+      border-left: 2px solid var(--green-dim);
       font-size: 11px;
-      color: #1976D2;
-      border-left: 3px solid #2196F3;
+      color: var(--text-dim);
     }
+    .info strong {
+      color: var(--amber);
+    }
+
     #fftControls {
       margin-top: 10px;
       padding-top: 10px;
-      border-top: 1px solid #eee;
+      border-top: 1px dashed var(--border);
     }
 
     /* Filter help text */
     .filter-help {
-      background: #f9f9f9;
-      border: 1px solid #e0e0e0;
-      border-radius: 6px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
       padding: 10px;
-      margin: 8px 0 14px 0;
+      margin: 8px 0 12px 0;
       font-size: 11px;
       line-height: 1.5;
-      color: #555;
+      color: var(--text-dim);
     }
     .filter-help strong {
-      color: #333;
+      color: var(--green);
       display: block;
       margin-bottom: 4px;
       font-size: 12px;
+      text-shadow: 0 0 6px var(--green-glow);
     }
     .filter-help .best-for {
       display: inline-block;
-      background: #e8f5e9;
-      color: #2e7d32;
-      padding: 2px 6px;
-      border-radius: 3px;
+      background: var(--green-dark);
+      color: var(--green);
+      padding: 1px 6px;
       font-size: 10px;
       font-weight: bold;
       margin-bottom: 6px;
+      border: 1px solid var(--green-dim);
     }
     .filter-help .look-for {
       margin-top: 6px;
       padding-top: 6px;
-      border-top: 1px solid #eee;
+      border-top: 1px dashed var(--border);
     }
     .filter-help .look-for span {
       font-weight: bold;
-      color: #d32f2f;
+      color: var(--red);
+      text-shadow: 0 0 4px rgba(255, 68, 68, 0.3);
     }
 
-    /* Online checker section */
+    /* Checker section */
     .checker-section {
-      margin-top: 15px;
-      padding: 15px;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin-top: 12px;
+      padding: 12px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
     }
-    .checker-section h3 {
-      margin-top: 0;
-    }
+    .checker-section h3 { margin-top: 0; }
+
     .checker-btn {
       display: flex;
       align-items: center;
       width: 100%;
-      padding: 8px 12px;
-      margin-bottom: 6px;
-      background: #f5f5f5;
-      border: 1px solid #ddd;
-      border-radius: 6px;
+      padding: 8px 10px;
+      margin-bottom: 4px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
       cursor: pointer;
-      font-size: 12px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
       text-align: left;
-      transition: background 0.2s;
+      color: var(--green);
+      transition: all 0.15s;
     }
     .checker-btn:hover {
-      background: #e3f2fd;
-      border-color: #90caf9;
+      background: var(--green-dark);
+      border-color: var(--green-dim);
+      box-shadow: 0 0 8px var(--green-glow);
     }
     .checker-btn:disabled {
-      opacity: 0.5;
+      opacity: 0.3;
       cursor: not-allowed;
     }
     .checker-btn .checker-icon {
-      width: 20px;
+      width: 22px;
       text-align: center;
       margin-right: 8px;
-      font-size: 14px;
+      font-size: 13px;
     }
-    .checker-btn .checker-info {
-      flex: 1;
-    }
+    .checker-btn .checker-info { flex: 1; }
     .checker-btn .checker-name {
       font-weight: bold;
-      color: #333;
+      color: var(--green);
     }
     .checker-btn .checker-desc {
       font-size: 10px;
-      color: #888;
-      margin-top: 2px;
+      color: var(--text-dim);
+      margin-top: 1px;
     }
     .checker-btn .checker-arrow {
-      color: #999;
+      color: var(--green-dim);
       font-size: 14px;
     }
     .checker-note {
       font-size: 10px;
-      color: #999;
+      color: var(--text-dim);
       margin-top: 8px;
       font-style: italic;
     }
     .no-image-msg {
       font-size: 11px;
-      color: #999;
+      color: var(--text-dim);
       text-align: center;
-      padding: 10px;
+      padding: 8px;
     }
 
     /* Watermark info section */
     .watermark-info {
-      margin-top: 15px;
-      padding: 15px;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin-top: 12px;
+      padding: 12px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
     }
-    .watermark-info h3 {
-      margin-top: 0;
-    }
+    .watermark-info h3 { margin-top: 0; }
+
     .wm-entry {
       padding: 6px 0;
-      border-bottom: 1px solid #f0f0f0;
+      border-bottom: 1px dashed var(--border);
       font-size: 11px;
       line-height: 1.4;
     }
     .wm-entry:last-child { border-bottom: none; }
     .wm-entry .wm-name {
       font-weight: bold;
-      color: #333;
+      color: var(--green);
     }
     .wm-entry .wm-by {
-      color: #888;
+      color: var(--text-dim);
       font-size: 10px;
     }
     .wm-entry .wm-detail {
-      color: #666;
+      color: var(--text-dim);
       margin-top: 2px;
     }
     .wm-tag {
       display: inline-block;
-      padding: 1px 5px;
-      border-radius: 3px;
+      padding: 0px 5px;
       font-size: 9px;
       font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
-    .wm-tag.public { background: #e8f5e9; color: #2e7d32; }
-    .wm-tag.no-public { background: #fff3e0; color: #e65100; }
+    .wm-tag.public {
+      background: var(--green-dark);
+      color: var(--green);
+      border: 1px solid var(--green-dim);
+    }
+    .wm-tag.no-public {
+      background: var(--red-dim);
+      color: var(--red);
+      border: 1px solid #993333;
+    }
+
+    /* Blinking cursor on status */
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    .status-cursor::after {
+      content: '_';
+      animation: blink 1s step-end infinite;
+      color: var(--green);
+    }
   </style>
 </head>
 <body>
-  <h2>Image Noise Analyzer</h2>
+  <h2>NOISE ANALYZER</h2>
 
   <div class="toggle-container">
-    <span><strong>Analysis Mode</strong></span>
+    <span><strong>[ANALYSIS MODE]</strong></span>
     <label class="switch">
       <input type="checkbox" id="toggleAnalysis">
       <span class="slider"></span>
@@ -265,28 +424,25 @@
   </div>
 
   <div class="controls">
-    <label for="analysisType">Analysis Type:</label>
+    <label for="analysisType">&gt; Analysis Type:</label>
     <select id="analysisType">
-      <option value="noise">Noise Pattern (High-pass)</option>
-      <option value="periodic">Periodic Patterns (AI Detection)</option>
-      <option value="fft">FFT Noise Analysis (Farid Method)</option>
-      <option value="ela">Error Level Analysis (ELA)</option>
-      <option value="gradient">Gradient Magnitude</option>
+      <option value="noise">NOISE PATTERN (HIGH-PASS)</option>
+      <option value="periodic">PERIODIC PATTERNS (AI DETECT)</option>
+      <option value="fft">FFT ANALYSIS (FARID METHOD)</option>
+      <option value="ela">ERROR LEVEL ANALYSIS (ELA)</option>
+      <option value="gradient">GRADIENT MAGNITUDE</option>
     </select>
 
-    <!-- Dynamic help text for selected filter -->
-    <div id="filterHelp" class="filter-help">
-      <!-- Populated by JS -->
-    </div>
+    <div id="filterHelp" class="filter-help"></div>
 
-    <label for="sensitivity">Sensitivity: <span class="value-display" id="sensValue">3x</span></label>
+    <label for="sensitivity">&gt; Sensitivity: <span class="value-display" id="sensValue">3x</span></label>
     <input type="range" id="sensitivity" min="1" max="10" value="3">
 
-    <label for="opacity">Opacity: <span class="value-display" id="opacityValue">100%</span></label>
+    <label for="opacity">&gt; Opacity: <span class="value-display" id="opacityValue">100%</span></label>
     <input type="range" id="opacity" min="0" max="100" value="100">
 
     <div id="fftControls" style="display: none;">
-      <label for="gaussianSigma">Gaussian sigma: <span class="value-display" id="sigmaValue">1.2</span></label>
+      <label for="gaussianSigma">&gt; Gaussian sigma: <span class="value-display" id="sigmaValue">1.2</span></label>
       <input type="range" id="gaussianSigma" min="5" max="30" value="12" step="1">
 
       <label style="display: flex; align-items: center; margin-top: 10px;">
@@ -295,110 +451,110 @@
       </label>
     </div>
 
-    <label for="colorMap">Color Map:</label>
+    <label for="colorMap">&gt; Color Map:</label>
     <select id="colorMap">
-      <option value="grayscale">Grayscale</option>
-      <option value="heat">Heat Map</option>
-      <option value="rainbow">Rainbow</option>
+      <option value="grayscale">GRAYSCALE</option>
+      <option value="heat">HEAT MAP</option>
+      <option value="rainbow">RAINBOW</option>
     </select>
   </div>
 
   <!-- Online AI Detection Checkers -->
   <div class="checker-section">
-    <h3>Check Image Online</h3>
-    <p id="checkerStatus" class="no-image-msg">Click an image on the page first, then use these buttons to check it with online AI detectors.</p>
+    <h3>External Scanners</h3>
+    <p id="checkerStatus" class="no-image-msg status-cursor">Select a target image to enable external scanning</p>
 
     <button class="checker-btn" id="checkC2PA" title="Checks for Content Credentials metadata embedded by cameras and AI tools">
-      <span class="checker-icon">&#128274;</span>
+      <span class="checker-icon">[C]</span>
       <span class="checker-info">
         <span class="checker-name">Content Credentials (C2PA)</span>
-        <span class="checker-desc">Checks provenance metadata from cameras, Adobe, OpenAI, Google</span>
+        <span class="checker-desc">Provenance metadata // Adobe, OpenAI, Google</span>
       </span>
-      <span class="checker-arrow">&#8594;</span>
+      <span class="checker-arrow">&gt;</span>
     </button>
 
     <button class="checker-btn" id="checkHive" title="AI-trained classifier that detects AI-generated images">
-      <span class="checker-icon">&#129302;</span>
+      <span class="checker-icon">[H]</span>
       <span class="checker-info">
         <span class="checker-name">Hive AI Detector</span>
-        <span class="checker-desc">ML-based detection - works on DALL-E, Midjourney, Stable Diffusion</span>
+        <span class="checker-desc">ML classifier // DALL-E, Midjourney, SD</span>
       </span>
-      <span class="checker-arrow">&#8594;</span>
+      <span class="checker-arrow">&gt;</span>
     </button>
 
     <button class="checker-btn" id="checkAIOrNot" title="Free AI image detection tool">
-      <span class="checker-icon">&#128269;</span>
+      <span class="checker-icon">[A]</span>
       <span class="checker-info">
         <span class="checker-name">AI or Not</span>
-        <span class="checker-desc">Free detector - also checks for C2PA watermarks</span>
+        <span class="checker-desc">Free detector // includes C2PA check</span>
       </span>
-      <span class="checker-arrow">&#8594;</span>
+      <span class="checker-arrow">&gt;</span>
     </button>
 
     <button class="checker-btn" id="checkIlluminarty" title="Detailed AI analysis with probability scores">
-      <span class="checker-icon">&#128161;</span>
+      <span class="checker-icon">[I]</span>
       <span class="checker-info">
         <span class="checker-name">Illuminarty</span>
-        <span class="checker-desc">Detailed probability breakdown by AI model type</span>
+        <span class="checker-desc">Probability breakdown // per-model scores</span>
       </span>
-      <span class="checker-arrow">&#8594;</span>
+      <span class="checker-arrow">&gt;</span>
     </button>
 
     <button class="checker-btn" id="checkSightEngine" title="Content moderation and AI detection API">
-      <span class="checker-icon">&#128065;</span>
+      <span class="checker-icon">[S]</span>
       <span class="checker-info">
         <span class="checker-name">SightEngine</span>
-        <span class="checker-desc">AI-generated image detection with confidence scores</span>
+        <span class="checker-desc">AI detection // confidence scoring</span>
       </span>
-      <span class="checker-arrow">&#8594;</span>
+      <span class="checker-arrow">&gt;</span>
     </button>
 
-    <p class="checker-note">These open the service in a new tab. You may need to upload the image manually on some sites.</p>
+    <p class="checker-note">* Opens service in new tab. Manual upload may be required.</p>
   </div>
 
   <!-- Known AI Watermark Systems -->
   <div class="watermark-info">
-    <h3>Known Invisible AI Watermarks</h3>
+    <h3>Watermark Database</h3>
 
     <div class="wm-entry">
-      <span class="wm-name">SynthID</span> <span class="wm-by">by Google DeepMind</span>
-      <span class="wm-tag no-public">No public detector</span>
-      <div class="wm-detail">Embedded in images from Google Imagen, Gemini, and Veo. Imperceptible pixel-level watermark that survives cropping, compression, and filters. Only Google can verify it internally.</div>
+      <span class="wm-name">SynthID</span> <span class="wm-by">// Google DeepMind</span>
+      <span class="wm-tag no-public">CLASSIFIED</span>
+      <div class="wm-detail">Pixel-level watermark in Imagen, Gemini, Veo. Survives crop/compress/filter. No public verifier exists.</div>
     </div>
 
     <div class="wm-entry">
-      <span class="wm-name">Content Credentials (C2PA)</span> <span class="wm-by">by Adobe / CAI Coalition</span>
-      <span class="wm-tag public">Public verifier</span>
-      <div class="wm-detail">Metadata-based provenance standard used by Adobe Firefly, OpenAI DALL-E 3, Microsoft Designer, Leica cameras, and others. Verifiable at contentcredentials.org/verify. Not a pixel watermark -- it's cryptographically signed metadata that can be stripped.</div>
+      <span class="wm-name">Content Credentials (C2PA)</span> <span class="wm-by">// Adobe CAI</span>
+      <span class="wm-tag public">PUBLIC</span>
+      <div class="wm-detail">Crypto-signed metadata. Used by Firefly, DALL-E 3, Designer, Leica. Verify at contentcredentials.org. Can be stripped.</div>
     </div>
 
     <div class="wm-entry">
-      <span class="wm-name">Stable Signature</span> <span class="wm-by">by Meta</span>
-      <span class="wm-tag no-public">No public detector</span>
-      <div class="wm-detail">Invisible watermark trained into the Stable Diffusion decoder. Survives JPEG compression, cropping, and brightness changes. No public verification tool available.</div>
+      <span class="wm-name">Stable Signature</span> <span class="wm-by">// Meta</span>
+      <span class="wm-tag no-public">CLASSIFIED</span>
+      <div class="wm-detail">Invisible watermark baked into SD decoder. Survives JPEG/crop/brightness. No public verification.</div>
     </div>
 
     <div class="wm-entry">
-      <span class="wm-name">DALL-E Metadata</span> <span class="wm-by">by OpenAI</span>
-      <span class="wm-tag public">C2PA verifiable</span>
-      <div class="wm-detail">DALL-E 3 and ChatGPT images include C2PA Content Credentials. Also adds a visible colored stripe (which can be cropped). Verify via C2PA checker above.</div>
+      <span class="wm-name">DALL-E Metadata</span> <span class="wm-by">// OpenAI</span>
+      <span class="wm-tag public">C2PA</span>
+      <div class="wm-detail">DALL-E 3 / ChatGPT images carry C2PA credentials. Visible stripe can be cropped. Use C2PA checker.</div>
     </div>
 
     <div class="wm-entry">
-      <span class="wm-name">PhotoDNA</span> <span class="wm-by">by Microsoft</span>
-      <span class="wm-tag no-public">Law enforcement only</span>
-      <div class="wm-detail">Perceptual hash-based system primarily used for CSAM detection. Not an AI watermark, but used for image identification. Not publicly accessible.</div>
+      <span class="wm-name">PhotoDNA</span> <span class="wm-by">// Microsoft</span>
+      <span class="wm-tag no-public">RESTRICTED</span>
+      <div class="wm-detail">Perceptual hash system for image ID. Law enforcement only. Not an AI watermark.</div>
     </div>
 
     <div class="wm-entry">
-      <span class="wm-name">Digimarc</span> <span class="wm-by">by Digimarc Corp</span>
-      <span class="wm-tag no-public">Enterprise only</span>
-      <div class="wm-detail">Commercial invisible watermarking used by stock photo agencies and publishers. Survives print and scan. Enterprise licensing required for detection.</div>
+      <span class="wm-name">Digimarc</span> <span class="wm-by">// Digimarc Corp</span>
+      <span class="wm-tag no-public">ENTERPRISE</span>
+      <div class="wm-detail">Commercial invisible watermarking for stock agencies. Survives print/scan. Enterprise license required.</div>
     </div>
   </div>
 
-  <div class="info" style="margin-top: 15px;">
-    <strong>How to use:</strong> Toggle Analysis Mode on, then click any image on the page. The overlay appears with your selected filter. Adjust settings here in real-time -- the overlay updates live. Use the online checkers above for a second opinion.
+  <div class="info" style="margin-top: 12px;">
+    <strong>&gt; USAGE:</strong> Enable analysis mode. Click target image. Overlay renders with selected filter. Adjust parameters in real-time. Cross-reference with external scanners.
   </div>
 
   <script src="popup.js"></script>
