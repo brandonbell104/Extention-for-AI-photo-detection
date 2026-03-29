@@ -1,4 +1,5 @@
 let isEnabled = false;
+let currentTheme = 'light';
 let settings = {
   analysisType: 'noise',
   sensitivity: 3,
@@ -11,15 +12,16 @@ let currentImageData = null;
 let currentDisplayElement = null;
 
 // Load settings
-chrome.storage.sync.get(['enabled', 'analysisType', 'sensitivity', 'colorMap', 'opacity', 'gaussianSigma', 'showDebug'], (data) => {
+chrome.storage.sync.get(['enabled', 'analysisType', 'sensitivity', 'colorMap', 'opacity', 'gaussianSigma', 'showDebug', 'theme'], (data) => {
   isEnabled = data.enabled ?? false;
+  currentTheme = data.theme ?? 'light';
   settings.analysisType = data.analysisType ?? 'noise';
   settings.sensitivity = data.sensitivity ?? 3;
   settings.colorMap = data.colorMap ?? 'grayscale';
   settings.opacity = data.opacity ?? 100;
   settings.gaussianSigma = (data.gaussianSigma ?? 12) / 10; // Convert back to 0.5-3.0 range
   settings.showDebug = data.showDebug ?? false;
-  
+
   if (isEnabled) {
     enableAnalysis();
   }
@@ -44,6 +46,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     // Reprocess the current image if one is being displayed
     if (currentImageData && currentDisplayElement) {
       reprocessCurrentImage();
+    }
+  } else if (request.action === 'updateTheme') {
+    currentTheme = request.theme;
+    // Update existing overlay if present
+    const overlay = document.getElementById('noise-analysis-overlay');
+    if (overlay) {
+      overlay.classList.remove('theme-light', 'theme-dark', 'theme-retro');
+      if (currentTheme !== 'light') {
+        overlay.classList.add('theme-' + currentTheme);
+      }
     }
   }
 });
@@ -841,7 +853,7 @@ function hslToRgb(h, s, l) {
 function createOverlay(targetElement, dataUrl) {
   const overlay = document.createElement('div');
   overlay.id = 'noise-analysis-overlay';
-  overlay.className = 'noise-overlay';
+  overlay.className = 'noise-overlay' + (currentTheme !== 'light' ? ' theme-' + currentTheme : '');
 
   const rect = targetElement.getBoundingClientRect();
   overlay.style.left = rect.left + window.scrollX + 'px';

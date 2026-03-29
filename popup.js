@@ -1,82 +1,165 @@
 // ============================================================================
-// Filter help descriptions — shown in the side panel when a filter is selected
+// Filter help descriptions
 // ============================================================================
 const FILTER_HELP = {
   noise: {
-    title: 'Noise Pattern Analysis (High-pass Filter)',
+    title: 'Noise Pattern Analysis',
     bestFor: 'AI-generated images',
-    description: 'Extracts the high-frequency noise from an image using a 3x3 convolution kernel. Every real camera sensor produces a unique pattern of random electronic noise. AI generators don\'t simulate this — they produce unnaturally smooth or uniformly patterned noise.',
-    howTo: 'Look at the overall texture of the result. A real photo will show fine, random static that looks like TV snow. An AI image will appear smoother with large uniform patches or repeating micro-patterns. Edited/pasted regions will have a visibly different noise texture than the surrounding area.',
-    suspicious: 'Uniform smooth patches, visible seams between regions with different noise levels, or repeating grid-like texture.'
+    description: 'Extracts high-frequency noise using a 3x3 convolution kernel. Real cameras produce unique random sensor noise. AI generators produce unnaturally smooth or patterned noise.',
+    howTo: 'Real photos show fine random static. AI images appear smoother with uniform patches or repeating micro-patterns. Pasted regions have visibly different noise texture.',
+    suspicious: 'Uniform smooth patches, seams between regions, repeating grid texture.'
   },
   periodic: {
     title: 'Periodic Pattern Detection',
-    bestFor: 'GAN-generated images & AI upscaling',
-    description: 'Searches for repeating patterns at fixed intervals (8px, 16px blocks) using autocorrelation analysis. GAN architectures (StyleGAN, ProGAN) and AI upscalers often produce subtle grid-like artifacts at regular intervals due to their convolutional layers.',
-    howTo: 'Bright areas indicate regions where patterns repeat at regular intervals. A real photo should show mostly random variation (dark/medium gray). Older GAN-generated images will show bright grid patterns, especially in smooth areas like skin or sky.',
-    suspicious: 'Bright grid lines, checkerboard patterns, or regularly-spaced bright spots. These indicate artificial periodic structure that doesn\'t occur in natural photographs.'
+    bestFor: 'GAN images & AI upscaling',
+    description: 'Searches for repeating patterns at 8/16px intervals via autocorrelation. GANs and AI upscalers produce subtle grid artifacts from their convolutional layers.',
+    howTo: 'Bright areas = repeating patterns. Real photos show random variation (dark gray). GAN images show bright grids, especially in smooth areas like skin or sky.',
+    suspicious: 'Bright grid lines, checkerboard patterns, regularly-spaced bright spots.'
   },
   fft: {
-    title: 'FFT Noise Analysis (Hany Farid Method)',
+    title: 'FFT Noise Analysis (Farid Method)',
     bestFor: 'Most thorough AI detection',
-    description: 'The gold standard forensic technique. Extracts the noise residual (original minus Gaussian blur), then applies a 2D Fast Fourier Transform to reveal frequency-domain patterns. Based on the peer-reviewed research of Hany Farid at UC Berkeley.',
-    howTo: 'Look at the center of the FFT output. A natural photo produces a smooth, roughly circular bright spot that fades gradually outward. AI-generated images produce cross/star patterns, bright spots at regular intervals, or grid-like structures radiating from the center.',
-    suspicious: 'Cross or plus-sign patterns, bright dots arranged in a grid, or any non-circular symmetric structure. These indicate periodic artifacts in the noise that are hallmarks of AI generation. Adjust the Gaussian sigma to tune — lower sigma catches fine AI artifacts, higher sigma catches broader manipulation.'
+    description: 'Gold standard forensic technique. Extracts noise residual then applies 2D FFT to reveal frequency-domain patterns. Based on Hany Farid\'s research.',
+    howTo: 'Natural photos produce a smooth circular center that fades outward. AI images produce cross/star patterns or grid structures radiating from center.',
+    suspicious: 'Cross patterns, bright dots in a grid, non-circular structures. Adjust sigma to tune sensitivity.'
   },
   ela: {
-    title: 'Error Level Analysis (ELA)',
-    bestFor: 'Photoshop edits & image splicing',
-    description: 'Simulates JPEG recompression error. When a JPEG is saved, every 8x8 block reaches a similar error level. If part of the image was pasted from a different source (saved at different quality), those blocks will have a noticeably different error level than the rest.',
-    howTo: 'A genuine, unedited photo should show relatively uniform brightness across the entire image. Pasted or cloned regions will stand out as significantly brighter or darker than surrounding areas because they were compressed at a different quality level.',
-    suspicious: 'Regions that are much brighter or darker than surrounding areas, especially if they follow the outline of an object. Note: this is better for detecting Photoshop edits than AI-generated images, since AI images are generated whole rather than spliced.'
+    title: 'Error Level Analysis',
+    bestFor: 'Photoshop edits & splicing',
+    description: 'Simulates JPEG recompression error. Pasted regions from different sources have different compression error levels than the original.',
+    howTo: 'Unedited photos show uniform brightness. Pasted or cloned regions stand out as brighter or darker. Better for edits than pure AI detection.',
+    suspicious: 'Regions much brighter or darker than surroundings, especially following object outlines.'
   },
   gradient: {
-    title: 'Gradient Magnitude (Edge Detection)',
-    bestFor: 'Supplementary — finding edit boundaries',
-    description: 'Computes the magnitude of intensity changes between neighboring pixels (Sobel-like operator). This highlights edges and boundaries. While not specifically diagnostic for AI or manipulation, it can reveal unnatural edge artifacts.',
-    howTo: 'This shows all edges in the image. By itself it won\'t tell you if an image is AI-generated. Use it as a supplementary tool — if you suspect a region was pasted in, the gradient view can reveal unnaturally sharp or blurred boundaries that don\'t match the rest of the image.',
-    suspicious: 'Edges that are unnaturally sharp or smooth compared to surrounding detail, or visible halos around pasted objects. Most useful when combined with other filters.'
+    title: 'Gradient Magnitude',
+    bestFor: 'Supplementary — edit boundaries',
+    description: 'Computes intensity change magnitude between pixels (edge detection). Not diagnostic for AI alone but can reveal unnatural edge artifacts.',
+    howTo: 'Shows all edges. Use as a supplement — look for unnaturally sharp or blurred boundaries that don\'t match the rest of the image.',
+    suspicious: 'Unnaturally sharp/smooth edges, visible halos around pasted objects.'
   }
 };
 
 // Online checker services
 const CHECKER_SERVICES = {
-  c2pa: {
-    name: 'Content Credentials (C2PA)',
-    url: 'https://contentcredentials.org/verify',
-    acceptsUrl: false
-  },
-  hive: {
-    name: 'Hive AI Detector',
-    url: 'https://hivemoderation.com/ai-generated-content-detection',
-    acceptsUrl: false
-  },
-  aiornot: {
-    name: 'AI or Not',
-    url: 'https://aiornot.com',
-    acceptsUrl: false
-  },
-  illuminarty: {
-    name: 'Illuminarty',
-    url: 'https://app.illuminarty.ai',
-    acceptsUrl: false
-  },
-  sightengine: {
-    name: 'SightEngine',
-    url: 'https://sightengine.com/detect-ai-generated-images',
-    acceptsUrl: false
-  }
+  c2pa: { url: 'https://contentcredentials.org/verify' },
+  hive: { url: 'https://hivemoderation.com/ai-generated-content-detection' },
+  aiornot: { url: 'https://aiornot.com' },
+  illuminarty: { url: 'https://app.illuminarty.ai' },
+  sightengine: { url: 'https://sightengine.com/detect-ai-generated-images' }
 };
 
-// Track the currently analyzed image URL
 let currentAnalyzedImageUrl = null;
 
 // ============================================================================
-// Initialize UI
+// Theme system
 // ============================================================================
 
-// Load saved settings
-chrome.storage.sync.get(['enabled', 'analysisType', 'sensitivity', 'colorMap', 'opacity', 'gaussianSigma', 'showDebug'], (data) => {
+function setTheme(theme) {
+  if (theme === 'light') {
+    document.documentElement.removeAttribute('data-theme');
+  } else {
+    document.documentElement.setAttribute('data-theme', theme);
+  }
+
+  // Update active button
+  document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+  const activeId = { light: 'themeLight', dark: 'themeDark', retro: 'themeRetro' }[theme];
+  const btn = document.getElementById(activeId);
+  if (btn) btn.classList.add('active');
+
+  // Save preference
+  chrome.storage.sync.set({ theme });
+
+  // Notify content script to update overlay theme
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (tabs[0]) {
+      chrome.tabs.sendMessage(tabs[0].id, { action: 'updateTheme', theme });
+    }
+  });
+}
+
+function initThemeButtons() {
+  const lightBtn = document.getElementById('themeLight');
+  const darkBtn = document.getElementById('themeDark');
+  const retroBtn = document.getElementById('themeRetro');
+
+  if (lightBtn) lightBtn.addEventListener('click', () => setTheme('light'));
+  if (darkBtn) darkBtn.addEventListener('click', () => setTheme('dark'));
+  if (retroBtn) retroBtn.addEventListener('click', () => setTheme('retro'));
+}
+
+// ============================================================================
+// Info panel toggles (i buttons)
+// ============================================================================
+
+function initInfoToggles() {
+  // Filter info button
+  const filterInfoBtn = document.getElementById('filterInfoBtn');
+  if (filterInfoBtn) {
+    filterInfoBtn.addEventListener('click', () => {
+      const panel = document.getElementById('filterHelp');
+      if (panel) panel.classList.toggle('open');
+    });
+  }
+
+  // Checker info button
+  const checkerInfoBtn = document.getElementById('checkerInfoBtn');
+  if (checkerInfoBtn) {
+    checkerInfoBtn.addEventListener('click', () => {
+      const panel = document.getElementById('checkerInfoPanel');
+      if (panel) panel.classList.toggle('open');
+    });
+  }
+
+  // Watermark section info button
+  const wmInfoBtn = document.getElementById('wmInfoBtn');
+  if (wmInfoBtn) {
+    wmInfoBtn.addEventListener('click', () => {
+      const panel = document.getElementById('wmInfoPanel');
+      if (panel) panel.classList.toggle('open');
+    });
+  }
+
+  // Individual watermark entry toggles
+  document.querySelectorAll('.wm-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetId = btn.getAttribute('data-target');
+      const detail = document.getElementById(targetId);
+      if (detail) detail.classList.toggle('open');
+    });
+  });
+}
+
+// ============================================================================
+// Filter help text
+// ============================================================================
+
+function updateFilterHelp(filterType) {
+  const helpEl = document.getElementById('filterHelp');
+  if (!helpEl) return;
+
+  const info = FILTER_HELP[filterType];
+  if (!info) { helpEl.innerHTML = ''; return; }
+
+  helpEl.innerHTML = `
+    <div class="info-tag">Best for: ${info.bestFor}</div>
+    <div>${info.description}</div>
+    <div class="info-section">
+      <strong style="font-size: 12px;">How to read:</strong> ${info.howTo}
+    </div>
+    <div class="info-section">
+      <span class="info-warn">Suspicious:</span> ${info.suspicious}
+    </div>
+  `;
+
+  // Keep open state if it was already open
+}
+
+// ============================================================================
+// Initialize
+// ============================================================================
+
+chrome.storage.sync.get(['enabled', 'analysisType', 'sensitivity', 'colorMap', 'opacity', 'gaussianSigma', 'showDebug', 'theme'], (data) => {
   document.getElementById('toggleAnalysis').checked = data.enabled ?? false;
   document.getElementById('analysisType').value = data.analysisType ?? 'noise';
   document.getElementById('sensitivity').value = data.sensitivity ?? 3;
@@ -88,93 +171,47 @@ chrome.storage.sync.get(['enabled', 'analysisType', 'sensitivity', 'colorMap', '
   document.getElementById('opacityValue').textContent = `${data.opacity ?? 100}%`;
   document.getElementById('sigmaValue').textContent = ((data.gaussianSigma ?? 12) / 10).toFixed(1);
 
-  // Show/hide FFT controls
   document.getElementById('fftControls').style.display =
     data.analysisType === 'fft' ? 'block' : 'none';
 
-  // Show filter help
+  // Apply saved theme
+  setTheme(data.theme ?? 'light');
+
+  // Update filter help
   updateFilterHelp(data.analysisType ?? 'noise');
 });
-
-// ============================================================================
-// Filter help text
-// ============================================================================
-
-function updateFilterHelp(filterType) {
-  const helpEl = document.getElementById('filterHelp');
-  if (!helpEl) return; // Not present in popup.html, only sidepanel.html
-
-  const info = FILTER_HELP[filterType];
-  if (!info) {
-    helpEl.style.display = 'none';
-    return;
-  }
-
-  helpEl.style.display = 'block';
-  helpEl.innerHTML = `
-    <strong>${info.title}</strong>
-    <span class="best-for">Best for: ${info.bestFor}</span>
-    <div>${info.description}</div>
-    <div class="look-for">
-      <strong style="display:inline; font-size:11px;">How to read:</strong> ${info.howTo}
-    </div>
-    <div class="look-for" style="border-top: 1px solid #eee; margin-top: 6px; padding-top: 6px;">
-      <span>Suspicious signs:</span> ${info.suspicious}
-    </div>
-  `;
-}
 
 // ============================================================================
 // Event listeners
 // ============================================================================
 
-// Debounce function to prevent too many storage writes
 function debounce(func, wait) {
   let timeout;
   return function executedFunction(...args) {
-    const later = () => {
-      clearTimeout(timeout);
-      func(...args);
-    };
     clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
+    timeout = setTimeout(() => func(...args), wait);
   };
 }
 
-// Toggle analysis
 document.getElementById('toggleAnalysis').addEventListener('change', (e) => {
   const enabled = e.target.checked;
   chrome.storage.sync.set({ enabled });
-
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    chrome.tabs.sendMessage(tabs[0].id, {
-      action: 'toggle',
-      enabled
-    });
+    chrome.tabs.sendMessage(tabs[0].id, { action: 'toggle', enabled });
   });
 });
 
-// Analysis type change
 document.getElementById('analysisType').addEventListener('change', (e) => {
   const analysisType = e.target.value;
   chrome.storage.sync.set({ analysisType });
-
-  // Show/hide FFT controls
   document.getElementById('fftControls').style.display =
     analysisType === 'fft' ? 'block' : 'none';
-
-  // Update help text
   updateFilterHelp(analysisType);
-
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    chrome.tabs.sendMessage(tabs[0].id, {
-      action: 'updateSettings',
-      settings: { analysisType }
-    });
+    chrome.tabs.sendMessage(tabs[0].id, { action: 'updateSettings', settings: { analysisType } });
   });
 });
 
-// Debounced save and send for sliders
 const debouncedSave = debounce((key, value) => {
   chrome.storage.sync.set({ [key]: value });
 }, 300);
@@ -182,15 +219,11 @@ const debouncedSave = debounce((key, value) => {
 const sendUpdate = (settings) => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     if (tabs[0]) {
-      chrome.tabs.sendMessage(tabs[0].id, {
-        action: 'updateSettings',
-        settings
-      });
+      chrome.tabs.sendMessage(tabs[0].id, { action: 'updateSettings', settings });
     }
   });
 };
 
-// Sensitivity change
 document.getElementById('sensitivity').addEventListener('input', (e) => {
   const sensitivity = parseInt(e.target.value);
   document.getElementById('sensValue').textContent = `${sensitivity}x`;
@@ -198,7 +231,6 @@ document.getElementById('sensitivity').addEventListener('input', (e) => {
   sendUpdate({ sensitivity });
 });
 
-// Opacity change
 document.getElementById('opacity').addEventListener('input', (e) => {
   const opacity = parseInt(e.target.value);
   document.getElementById('opacityValue').textContent = `${opacity}%`;
@@ -206,20 +238,14 @@ document.getElementById('opacity').addEventListener('input', (e) => {
   sendUpdate({ opacity });
 });
 
-// Color map change
 document.getElementById('colorMap').addEventListener('change', (e) => {
   const colorMap = e.target.value;
   chrome.storage.sync.set({ colorMap });
-
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    chrome.tabs.sendMessage(tabs[0].id, {
-      action: 'updateSettings',
-      settings: { colorMap }
-    });
+    chrome.tabs.sendMessage(tabs[0].id, { action: 'updateSettings', settings: { colorMap } });
   });
 });
 
-// Gaussian sigma change (for FFT mode)
 document.getElementById('gaussianSigma').addEventListener('input', (e) => {
   const gaussianSigma = parseInt(e.target.value);
   document.getElementById('sigmaValue').textContent = (gaussianSigma / 10).toFixed(1);
@@ -227,7 +253,6 @@ document.getElementById('gaussianSigma').addEventListener('input', (e) => {
   sendUpdate({ gaussianSigma });
 });
 
-// Debug mode toggle
 document.getElementById('showDebug').addEventListener('change', (e) => {
   const showDebug = e.target.checked;
   chrome.storage.sync.set({ showDebug });
@@ -235,22 +260,18 @@ document.getElementById('showDebug').addEventListener('change', (e) => {
 });
 
 // ============================================================================
-// Online checker buttons
+// Online checkers
 // ============================================================================
 
 function setupCheckerButton(buttonId, serviceKey) {
   const btn = document.getElementById(buttonId);
-  if (!btn) return; // Not present in popup.html
-
+  if (!btn) return;
   btn.addEventListener('click', () => {
-    const service = CHECKER_SERVICES[serviceKey];
-    // Open the checker service in a new tab
-    chrome.tabs.create({ url: service.url });
+    chrome.tabs.create({ url: CHECKER_SERVICES[serviceKey].url });
   });
 }
 
-// Listen for image URL updates from content script
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((request) => {
   if (request.action === 'imageAnalyzed') {
     currentAnalyzedImageUrl = request.imageUrl;
     updateCheckerStatus(true);
@@ -261,21 +282,26 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 function updateCheckerStatus(hasImage) {
-  const statusEl = document.getElementById('checkerStatus');
-  if (!statusEl) return;
-
+  const el = document.getElementById('checkerStatus');
+  if (!el) return;
   if (hasImage) {
-    statusEl.textContent = 'Image selected! Click a service below to check it online.';
-    statusEl.style.color = '#2e7d32';
+    el.textContent = 'Image selected — choose a scanner below';
+    el.style.color = 'var(--success)';
   } else {
-    statusEl.textContent = 'Click an image on the page first, then use these buttons to check it with online AI detectors.';
-    statusEl.style.color = '#999';
+    el.textContent = 'Select an image first to enable scanning';
+    el.style.color = '';
   }
 }
 
-// Initialize all checker buttons
 setupCheckerButton('checkC2PA', 'c2pa');
 setupCheckerButton('checkHive', 'hive');
 setupCheckerButton('checkAIOrNot', 'aiornot');
 setupCheckerButton('checkIlluminarty', 'illuminarty');
 setupCheckerButton('checkSightEngine', 'sightengine');
+
+// ============================================================================
+// Init
+// ============================================================================
+
+initThemeButtons();
+initInfoToggles();

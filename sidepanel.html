@@ -5,556 +5,659 @@
     @import url('https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap');
 
     :root {
-      --green: #33ff33;
-      --green-dim: #1a9f1a;
-      --green-dark: #0d4f0d;
-      --green-glow: rgba(51, 255, 51, 0.15);
-      --amber: #ffb800;
-      --amber-dim: #996e00;
-      --red: #ff4444;
-      --red-dim: #661a1a;
-      --bg: #0a0a0a;
-      --bg-panel: #0f1a0f;
-      --bg-input: #0a140a;
-      --border: #1a3a1a;
-      --text: #33ff33;
-      --text-dim: #1a9f1a;
+      /* Minimalist Light (default) */
+      --bg: #ffffff;
+      --bg-secondary: #f5f5f7;
+      --bg-input: #ffffff;
+      --text: #1d1d1f;
+      --text-secondary: #86868b;
+      --text-tertiary: #aeaeb2;
+      --border: #d2d2d7;
+      --border-light: #e5e5ea;
+      --accent: #007aff;
+      --accent-hover: #0056b3;
+      --accent-bg: rgba(0, 122, 255, 0.08);
+      --danger: #ff3b30;
+      --success: #34c759;
+      --success-bg: rgba(52, 199, 89, 0.1);
+      --warning: #ff9500;
+      --warning-bg: rgba(255, 149, 0, 0.1);
+      --shadow: 0 1px 3px rgba(0,0,0,0.06);
+      --radius: 10px;
+      --radius-sm: 6px;
+      --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      --font-mono: 'SF Mono', SFMono-Regular, Menlo, monospace;
+      --toggle-bg: #e5e5ea;
+      --toggle-active: #34c759;
+      --slider-track: #e5e5ea;
+      --slider-thumb: #007aff;
+      --tag-public-bg: rgba(52, 199, 89, 0.12);
+      --tag-public-text: #248a3d;
+      --tag-restricted-bg: rgba(255, 59, 48, 0.1);
+      --tag-restricted-text: #d70015;
     }
 
-    * { box-sizing: border-box; }
+    [data-theme="dark"] {
+      --bg: #1c1c1e;
+      --bg-secondary: #2c2c2e;
+      --bg-input: #3a3a3c;
+      --text: #f5f5f7;
+      --text-secondary: #98989d;
+      --text-tertiary: #636366;
+      --border: #38383a;
+      --border-light: #48484a;
+      --accent: #0a84ff;
+      --accent-hover: #409cff;
+      --accent-bg: rgba(10, 132, 255, 0.15);
+      --danger: #ff453a;
+      --success: #30d158;
+      --success-bg: rgba(48, 209, 88, 0.15);
+      --warning: #ff9f0a;
+      --warning-bg: rgba(255, 159, 10, 0.15);
+      --shadow: 0 1px 3px rgba(0,0,0,0.3);
+      --toggle-bg: #636366;
+      --toggle-active: #30d158;
+      --slider-track: #48484a;
+      --slider-thumb: #0a84ff;
+      --tag-public-bg: rgba(48, 209, 88, 0.18);
+      --tag-public-text: #30d158;
+      --tag-restricted-bg: rgba(255, 69, 58, 0.15);
+      --tag-restricted-text: #ff453a;
+    }
+
+    [data-theme="retro"] {
+      --bg: #0a0a0a;
+      --bg-secondary: #0f1a0f;
+      --bg-input: #0a140a;
+      --text: #33ff33;
+      --text-secondary: #1a9f1a;
+      --text-tertiary: #0d4f0d;
+      --border: #1a3a1a;
+      --border-light: #1a3a1a;
+      --accent: #33ff33;
+      --accent-hover: #66ff66;
+      --accent-bg: rgba(51, 255, 51, 0.08);
+      --danger: #ff4444;
+      --success: #33ff33;
+      --success-bg: rgba(51, 255, 51, 0.1);
+      --warning: #ffb800;
+      --warning-bg: rgba(255, 184, 0, 0.1);
+      --shadow: none;
+      --radius: 0px;
+      --radius-sm: 0px;
+      --font: 'Share Tech Mono', 'Courier New', monospace;
+      --font-mono: 'VT323', monospace;
+      --toggle-bg: #1a1a1a;
+      --toggle-active: #0d4f0d;
+      --slider-track: #1a1a1a;
+      --slider-thumb: #33ff33;
+      --tag-public-bg: rgba(51, 255, 51, 0.12);
+      --tag-public-text: #33ff33;
+      --tag-restricted-bg: rgba(255, 68, 68, 0.12);
+      --tag-restricted-text: #ff4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       width: 100%;
       min-height: 100vh;
-      padding: 12px;
-      font-family: 'Share Tech Mono', 'Courier New', monospace;
-      margin: 0;
+      padding: 16px;
+      font-family: var(--font);
       background: var(--bg);
       color: var(--text);
-      font-size: 12px;
+      font-size: 13px;
       line-height: 1.5;
-      position: relative;
+      -webkit-font-smoothing: antialiased;
+      transition: background 0.2s, color 0.2s;
     }
 
-    /* CRT scanline overlay */
-    body::before {
+    /* Retro scanlines — only in retro theme */
+    [data-theme="retro"] body::before {
       content: '';
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      top: 0; left: 0; right: 0; bottom: 0;
       background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 2px,
-        rgba(0, 0, 0, 0.15) 2px,
-        rgba(0, 0, 0, 0.15) 4px
+        0deg, transparent, transparent 2px,
+        rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 4px
       );
       pointer-events: none;
       z-index: 9999;
     }
-
-    /* CRT vignette */
-    body::after {
+    [data-theme="retro"] body::after {
       content: '';
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.4) 100%);
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.35) 100%);
       pointer-events: none;
       z-index: 9998;
     }
 
-    h2 {
-      margin: 0 0 12px 0;
-      font-family: 'VT323', monospace;
-      font-size: 22px;
-      color: var(--green);
-      text-shadow: 0 0 10px var(--green-glow), 0 0 20px var(--green-glow);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 8px;
-    }
-    h2::before {
-      content: '> ';
-      color: var(--green-dim);
-    }
-
-    h3 {
-      margin: 10px 0 6px 0;
-      font-family: 'VT323', monospace;
-      font-size: 16px;
-      color: var(--amber);
-      text-shadow: 0 0 8px rgba(255, 184, 0, 0.2);
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
-    h3::before {
-      content: '// ';
-      color: var(--amber-dim);
-    }
-
-    /* Toggle section */
-    .toggle-container {
+    /* ---- Header ---- */
+    .header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 12px;
-      padding: 10px;
-      background: var(--bg-panel);
-      border: 1px solid var(--border);
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-light);
     }
-    .toggle-container span {
-      color: var(--green);
+    .header h1 {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+    }
+    [data-theme="retro"] .header h1 {
+      font-family: 'VT323', monospace;
+      font-size: 22px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-shadow: 0 0 10px rgba(51, 255, 51, 0.3);
+    }
+    [data-theme="retro"] .header h1::before { content: '> '; color: var(--text-secondary); }
+
+    .theme-controls {
+      display: flex;
+      gap: 4px;
+    }
+    .theme-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: var(--text-secondary);
+      transition: all 0.15s;
+      padding: 0;
+    }
+    .theme-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .theme-btn.active { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
+
+    /* ---- Cards ---- */
+    .card {
+      background: var(--bg-secondary);
+      border-radius: var(--radius);
+      padding: 14px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow);
+    }
+    [data-theme="retro"] .card { border: 1px solid var(--border); }
+
+    .card-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+    }
+    [data-theme="retro"] .card-title { font-family: 'VT323', monospace; font-size: 15px; letter-spacing: 1px; }
+    [data-theme="retro"] .card-title::before { content: '// '; color: var(--text-tertiary); }
+
+    /* ---- Toggle ---- */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .toggle-label {
+      font-size: 15px;
+      font-weight: 500;
+    }
+    [data-theme="retro"] .toggle-label {
+      font-size: 13px;
       text-transform: uppercase;
       letter-spacing: 1px;
-      font-size: 12px;
     }
-
-    /* Retro toggle switch */
     .switch {
       position: relative;
       display: inline-block;
-      width: 52px;
-      height: 24px;
+      width: 51px;
+      height: 31px;
     }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider {
       position: absolute;
       cursor: pointer;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: #1a1a1a;
-      border: 1px solid #333;
-      transition: .3s;
+      inset: 0;
+      background: var(--toggle-bg);
+      border-radius: 31px;
+      transition: 0.25s;
     }
-    .slider:before {
+    .slider::before {
       position: absolute;
       content: "";
-      height: 16px;
-      width: 16px;
-      left: 3px;
-      bottom: 3px;
-      background-color: #555;
-      transition: .3s;
+      height: 27px;
+      width: 27px;
+      left: 2px;
+      bottom: 2px;
+      background: white;
+      border-radius: 50%;
+      transition: 0.25s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
     }
-    input:checked + .slider {
-      background-color: var(--green-dark);
-      border-color: var(--green-dim);
-      box-shadow: 0 0 8px var(--green-glow), inset 0 0 8px var(--green-glow);
-    }
-    input:checked + .slider:before {
-      transform: translateX(28px);
-      background-color: var(--green);
-      box-shadow: 0 0 6px var(--green);
-    }
+    input:checked + .slider { background: var(--toggle-active); }
+    input:checked + .slider::before { transform: translateX(20px); }
+    [data-theme="retro"] .slider { border-radius: 0; border: 1px solid var(--border); }
+    [data-theme="retro"] .slider::before { border-radius: 0; width: 23px; height: 25px; left: 2px; }
+    [data-theme="retro"] input:checked + .slider { box-shadow: 0 0 8px rgba(51,255,51,0.2); border-color: var(--text-secondary); }
+    [data-theme="retro"] input:checked + .slider::before { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
 
-    /* Controls panel */
-    .controls {
-      margin-top: 12px;
-      padding: 12px;
-      background: var(--bg-panel);
-      border: 1px solid var(--border);
+    /* ---- Form controls ---- */
+    .form-group { margin-bottom: 12px; }
+    .form-group:last-child { margin-bottom: 0; }
+    .form-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 6px;
     }
-
-    label {
-      display: block;
-      margin-bottom: 4px;
-      font-size: 11px;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+    .form-value {
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      margin-left: auto;
     }
+    [data-theme="retro"] .form-value { color: var(--warning); }
 
     select {
       width: 100%;
-      margin-bottom: 10px;
-      padding: 6px 8px;
+      padding: 8px 10px;
       background: var(--bg-input);
-      color: var(--green);
+      color: var(--text);
       border: 1px solid var(--border);
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 11px;
-      cursor: pointer;
+      border-radius: var(--radius-sm);
+      font-family: var(--font);
+      font-size: 13px;
       outline: none;
-    }
-    select:focus {
-      border-color: var(--green-dim);
-      box-shadow: 0 0 6px var(--green-glow);
-    }
-    select option {
-      background: var(--bg);
-      color: var(--green);
-    }
-
-    /* Retro range slider */
-    input[type="range"] {
-      width: 100%;
-      margin-bottom: 10px;
+      cursor: pointer;
       -webkit-appearance: none;
       appearance: none;
-      height: 6px;
-      background: var(--bg-input);
-      border: 1px solid var(--border);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2386868b' d='M3 4.5L6 8l3-3.5'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+    }
+    select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-bg); }
+    [data-theme="retro"] select { font-family: var(--font); background-image: none; }
+    select option { background: var(--bg); color: var(--text); }
+
+    input[type="range"] {
+      width: 100%;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 4px;
+      background: var(--slider-track);
+      border-radius: 2px;
       outline: none;
+      margin: 4px 0;
     }
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
-      appearance: none;
-      width: 14px;
-      height: 14px;
-      background: var(--green);
-      border: none;
+      width: 20px; height: 20px;
+      background: var(--slider-thumb);
+      border-radius: 50%;
       cursor: pointer;
-      box-shadow: 0 0 6px var(--green);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.15);
     }
     input[type="range"]::-moz-range-thumb {
-      width: 14px;
-      height: 14px;
-      background: var(--green);
+      width: 20px; height: 20px;
+      background: var(--slider-thumb);
+      border-radius: 50%;
       border: none;
       cursor: pointer;
-      box-shadow: 0 0 6px var(--green);
     }
+    [data-theme="retro"] input[type="range"] { border-radius: 0; height: 6px; border: 1px solid var(--border); background: var(--bg-input); }
+    [data-theme="retro"] input[type="range"]::-webkit-slider-thumb { border-radius: 0; width: 14px; height: 14px; box-shadow: 0 0 6px var(--accent); }
+    [data-theme="retro"] input[type="range"]::-moz-range-thumb { border-radius: 0; width: 14px; height: 14px; box-shadow: 0 0 6px var(--accent); }
 
-    .value-display {
-      font-size: 11px;
-      color: var(--amber);
-      text-shadow: 0 0 4px rgba(255, 184, 0, 0.3);
-    }
-
-    /* Checkbox retro style */
-    input[type="checkbox"] {
-      accent-color: var(--green);
-    }
-
-    .info {
-      margin-top: 12px;
-      padding: 10px;
-      background: var(--bg-panel);
-      border-left: 2px solid var(--green-dim);
-      font-size: 11px;
-      color: var(--text-dim);
-    }
-    .info strong {
-      color: var(--amber);
-    }
+    input[type="checkbox"] { accent-color: var(--accent); }
 
     #fftControls {
       margin-top: 10px;
       padding-top: 10px;
-      border-top: 1px dashed var(--border);
+      border-top: 1px solid var(--border-light);
     }
 
-    /* Filter help text */
-    .filter-help {
-      background: var(--bg-input);
-      border: 1px solid var(--border);
-      padding: 10px;
-      margin: 8px 0 12px 0;
+    /* ---- Info icon (i) button ---- */
+    .info-btn {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 1.5px solid var(--text-tertiary);
+      background: transparent;
+      color: var(--text-tertiary);
       font-size: 11px;
-      line-height: 1.5;
-      color: var(--text-dim);
+      font-weight: 700;
+      font-style: italic;
+      font-family: Georgia, 'Times New Roman', serif;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: all 0.15s;
+      flex-shrink: 0;
     }
-    .filter-help strong {
-      color: var(--green);
-      display: block;
-      margin-bottom: 4px;
+    .info-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-bg); }
+    [data-theme="retro"] .info-btn { border-radius: 0; font-family: var(--font); font-style: normal; }
+
+    /* Expandable info panel */
+    .info-panel {
+      display: none;
+      margin-top: 8px;
+      padding: 10px 12px;
+      background: var(--bg);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-sm);
       font-size: 12px;
-      text-shadow: 0 0 6px var(--green-glow);
+      line-height: 1.6;
+      color: var(--text-secondary);
     }
-    .filter-help .best-for {
+    .info-panel.open { display: block; }
+    .info-panel .info-tag {
       display: inline-block;
-      background: var(--green-dark);
-      color: var(--green);
-      padding: 1px 6px;
       font-size: 10px;
-      font-weight: bold;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 3px;
       margin-bottom: 6px;
-      border: 1px solid var(--green-dim);
+      background: var(--success-bg);
+      color: var(--success);
     }
-    .filter-help .look-for {
-      margin-top: 6px;
-      padding-top: 6px;
-      border-top: 1px dashed var(--border);
+    [data-theme="retro"] .info-panel .info-tag { border-radius: 0; border: 1px solid var(--success); }
+    .info-panel .info-section {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border-light);
     }
-    .filter-help .look-for span {
-      font-weight: bold;
-      color: var(--red);
-      text-shadow: 0 0 4px rgba(255, 68, 68, 0.3);
-    }
+    .info-panel .info-warn { color: var(--danger); font-weight: 600; }
 
-    /* Checker section */
-    .checker-section {
-      margin-top: 12px;
-      padding: 12px;
-      background: var(--bg-panel);
-      border: 1px solid var(--border);
-    }
-    .checker-section h3 { margin-top: 0; }
-
+    /* ---- Checker buttons ---- */
     .checker-btn {
       display: flex;
       align-items: center;
       width: 100%;
-      padding: 8px 10px;
-      margin-bottom: 4px;
-      background: var(--bg-input);
-      border: 1px solid var(--border);
+      padding: 10px 12px;
+      margin-bottom: 6px;
+      background: var(--bg);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-sm);
       cursor: pointer;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 11px;
+      font-family: var(--font);
+      font-size: 13px;
       text-align: left;
-      color: var(--green);
+      color: var(--text);
       transition: all 0.15s;
     }
-    .checker-btn:hover {
-      background: var(--green-dark);
-      border-color: var(--green-dim);
-      box-shadow: 0 0 8px var(--green-glow);
-    }
-    .checker-btn:disabled {
-      opacity: 0.3;
-      cursor: not-allowed;
-    }
-    .checker-btn .checker-icon {
-      width: 22px;
+    .checker-btn:last-of-type { margin-bottom: 0; }
+    .checker-btn:hover { border-color: var(--accent); background: var(--accent-bg); }
+    .checker-icon { margin-right: 10px; font-size: 15px; flex-shrink: 0; }
+    .checker-info { flex: 1; min-width: 0; }
+    .checker-name { font-weight: 600; font-size: 13px; }
+    .checker-desc { font-size: 11px; color: var(--text-secondary); margin-top: 1px; }
+    .checker-arrow { color: var(--text-tertiary); font-size: 16px; margin-left: 8px; }
+    [data-theme="retro"] .checker-btn .checker-icon { font-family: var(--font); }
+
+    .checker-status {
+      font-size: 12px;
+      color: var(--text-tertiary);
       text-align: center;
-      margin-right: 8px;
-      font-size: 13px;
-    }
-    .checker-btn .checker-info { flex: 1; }
-    .checker-btn .checker-name {
-      font-weight: bold;
-      color: var(--green);
-    }
-    .checker-btn .checker-desc {
-      font-size: 10px;
-      color: var(--text-dim);
-      margin-top: 1px;
-    }
-    .checker-btn .checker-arrow {
-      color: var(--green-dim);
-      font-size: 14px;
-    }
-    .checker-note {
-      font-size: 10px;
-      color: var(--text-dim);
-      margin-top: 8px;
-      font-style: italic;
-    }
-    .no-image-msg {
-      font-size: 11px;
-      color: var(--text-dim);
-      text-align: center;
-      padding: 8px;
+      padding: 6px 0 10px;
     }
 
-    /* Watermark info section */
-    .watermark-info {
-      margin-top: 12px;
-      padding: 12px;
-      background: var(--bg-panel);
-      border: 1px solid var(--border);
-    }
-    .watermark-info h3 { margin-top: 0; }
-
+    /* ---- Watermark entries ---- */
     .wm-entry {
-      padding: 6px 0;
-      border-bottom: 1px dashed var(--border);
-      font-size: 11px;
-      line-height: 1.4;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border-light);
+      font-size: 12px;
     }
-    .wm-entry:last-child { border-bottom: none; }
-    .wm-entry .wm-name {
-      font-weight: bold;
-      color: var(--green);
-    }
-    .wm-entry .wm-by {
-      color: var(--text-dim);
-      font-size: 10px;
-    }
-    .wm-entry .wm-detail {
-      color: var(--text-dim);
-      margin-top: 2px;
-    }
+    .wm-entry:last-child { border-bottom: none; padding-bottom: 0; }
+    .wm-header { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .wm-name { font-weight: 600; color: var(--text); }
+    .wm-by { color: var(--text-tertiary); font-size: 11px; }
     .wm-tag {
-      display: inline-block;
-      padding: 0px 5px;
       font-size: 9px;
-      font-weight: bold;
+      font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      padding: 1px 5px;
+      border-radius: 3px;
     }
-    .wm-tag.public {
-      background: var(--green-dark);
-      color: var(--green);
-      border: 1px solid var(--green-dim);
+    .wm-tag.public { background: var(--tag-public-bg); color: var(--tag-public-text); }
+    .wm-tag.restricted { background: var(--tag-restricted-bg); color: var(--tag-restricted-text); }
+    [data-theme="retro"] .wm-tag { border-radius: 0; }
+    .wm-detail {
+      display: none;
+      margin-top: 4px;
+      color: var(--text-secondary);
+      line-height: 1.5;
     }
-    .wm-tag.no-public {
-      background: var(--red-dim);
-      color: var(--red);
-      border: 1px solid #993333;
-    }
+    .wm-detail.open { display: block; }
 
-    /* Blinking cursor on status */
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0; }
+    /* ---- Footer info ---- */
+    .footer-info {
+      margin-top: 12px;
+      padding: 10px 12px;
+      background: var(--bg-secondary);
+      border-radius: var(--radius);
+      font-size: 12px;
+      color: var(--text-secondary);
+      border-left: 3px solid var(--accent);
     }
-    .status-cursor::after {
-      content: '_';
-      animation: blink 1s step-end infinite;
-      color: var(--green);
-    }
+    [data-theme="retro"] .footer-info { border-radius: 0; border: 1px solid var(--border); border-left: 2px solid var(--accent); }
   </style>
 </head>
 <body>
-  <h2>NOISE ANALYZER</h2>
-
-  <div class="toggle-container">
-    <span><strong>[ANALYSIS MODE]</strong></span>
-    <label class="switch">
-      <input type="checkbox" id="toggleAnalysis">
-      <span class="slider"></span>
-    </label>
+  <!-- Header with theme switcher -->
+  <div class="header">
+    <h1>Noise Analyzer</h1>
+    <div class="theme-controls">
+      <button class="theme-btn active" id="themeLight" title="Light mode">&#9788;</button>
+      <button class="theme-btn" id="themeDark" title="Dark mode">&#9790;</button>
+      <button class="theme-btn" id="themeRetro" title="Retro CRT">&#9741;</button>
+    </div>
   </div>
 
-  <div class="controls">
-    <label for="analysisType">&gt; Analysis Type:</label>
-    <select id="analysisType">
-      <option value="noise">NOISE PATTERN (HIGH-PASS)</option>
-      <option value="periodic">PERIODIC PATTERNS (AI DETECT)</option>
-      <option value="fft">FFT ANALYSIS (FARID METHOD)</option>
-      <option value="ela">ERROR LEVEL ANALYSIS (ELA)</option>
-      <option value="gradient">GRADIENT MAGNITUDE</option>
-    </select>
+  <!-- Enable/Disable -->
+  <div class="card">
+    <div class="toggle-row">
+      <span class="toggle-label">Analysis Mode</span>
+      <label class="switch">
+        <input type="checkbox" id="toggleAnalysis">
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
 
-    <div id="filterHelp" class="filter-help"></div>
+  <!-- Controls -->
+  <div class="card">
+    <div class="card-title">Filter Settings</div>
 
-    <label for="sensitivity">&gt; Sensitivity: <span class="value-display" id="sensValue">3x</span></label>
-    <input type="range" id="sensitivity" min="1" max="10" value="3">
+    <div class="form-group">
+      <div class="form-label">
+        Analysis Type
+        <button class="info-btn" id="filterInfoBtn" title="About this filter">i</button>
+      </div>
+      <select id="analysisType">
+        <option value="noise">Noise Pattern (High-pass)</option>
+        <option value="periodic">Periodic Patterns (AI Detection)</option>
+        <option value="fft">FFT Noise Analysis (Farid Method)</option>
+        <option value="ela">Error Level Analysis (ELA)</option>
+        <option value="gradient">Gradient Magnitude</option>
+      </select>
+      <div id="filterHelp" class="info-panel"></div>
+    </div>
 
-    <label for="opacity">&gt; Opacity: <span class="value-display" id="opacityValue">100%</span></label>
-    <input type="range" id="opacity" min="0" max="100" value="100">
+    <div class="form-group">
+      <div class="form-label">Sensitivity <span class="form-value" id="sensValue">3x</span></div>
+      <input type="range" id="sensitivity" min="1" max="10" value="3">
+    </div>
+
+    <div class="form-group">
+      <div class="form-label">Opacity <span class="form-value" id="opacityValue">100%</span></div>
+      <input type="range" id="opacity" min="0" max="100" value="100">
+    </div>
 
     <div id="fftControls" style="display: none;">
-      <label for="gaussianSigma">&gt; Gaussian sigma: <span class="value-display" id="sigmaValue">1.2</span></label>
-      <input type="range" id="gaussianSigma" min="5" max="30" value="12" step="1">
-
-      <label style="display: flex; align-items: center; margin-top: 10px;">
-        <input type="checkbox" id="showDebug" style="width: auto; margin-right: 8px;">
-        Show Debug Layers
+      <div class="form-group">
+        <div class="form-label">Gaussian Sigma <span class="form-value" id="sigmaValue">1.2</span></div>
+        <input type="range" id="gaussianSigma" min="5" max="30" value="12" step="1">
+      </div>
+      <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer;">
+        <input type="checkbox" id="showDebug" style="width: auto;">
+        Debug Layers
       </label>
     </div>
 
-    <label for="colorMap">&gt; Color Map:</label>
-    <select id="colorMap">
-      <option value="grayscale">GRAYSCALE</option>
-      <option value="heat">HEAT MAP</option>
-      <option value="rainbow">RAINBOW</option>
-    </select>
+    <div class="form-group">
+      <div class="form-label">Color Map</div>
+      <select id="colorMap">
+        <option value="grayscale">Grayscale</option>
+        <option value="heat">Heat Map</option>
+        <option value="rainbow">Rainbow</option>
+      </select>
+    </div>
   </div>
 
-  <!-- Online AI Detection Checkers -->
-  <div class="checker-section">
-    <h3>External Scanners</h3>
-    <p id="checkerStatus" class="no-image-msg status-cursor">Select a target image to enable external scanning</p>
+  <!-- Online Checkers -->
+  <div class="card">
+    <div class="card-title" style="display: flex; align-items: center; gap: 6px;">
+      External Scanners
+      <button class="info-btn" id="checkerInfoBtn" title="About online checkers">i</button>
+    </div>
+    <div id="checkerInfoPanel" class="info-panel">
+      These services use machine learning and metadata analysis to detect AI-generated images. Click any button to open the service in a new tab where you can upload the image for analysis. Results vary — use multiple for best accuracy.
+    </div>
 
-    <button class="checker-btn" id="checkC2PA" title="Checks for Content Credentials metadata embedded by cameras and AI tools">
-      <span class="checker-icon">[C]</span>
+    <p id="checkerStatus" class="checker-status">Select an image first to enable scanning</p>
+
+    <button class="checker-btn" id="checkC2PA">
+      <span class="checker-icon">&#128274;</span>
       <span class="checker-info">
-        <span class="checker-name">Content Credentials (C2PA)</span>
-        <span class="checker-desc">Provenance metadata // Adobe, OpenAI, Google</span>
+        <span class="checker-name">Content Credentials</span>
+        <span class="checker-desc">C2PA provenance metadata</span>
       </span>
-      <span class="checker-arrow">&gt;</span>
+      <span class="checker-arrow">&#8250;</span>
     </button>
 
-    <button class="checker-btn" id="checkHive" title="AI-trained classifier that detects AI-generated images">
-      <span class="checker-icon">[H]</span>
+    <button class="checker-btn" id="checkHive">
+      <span class="checker-icon">&#129302;</span>
       <span class="checker-info">
         <span class="checker-name">Hive AI Detector</span>
-        <span class="checker-desc">ML classifier // DALL-E, Midjourney, SD</span>
+        <span class="checker-desc">ML classifier for AI images</span>
       </span>
-      <span class="checker-arrow">&gt;</span>
+      <span class="checker-arrow">&#8250;</span>
     </button>
 
-    <button class="checker-btn" id="checkAIOrNot" title="Free AI image detection tool">
-      <span class="checker-icon">[A]</span>
+    <button class="checker-btn" id="checkAIOrNot">
+      <span class="checker-icon">&#128269;</span>
       <span class="checker-info">
         <span class="checker-name">AI or Not</span>
-        <span class="checker-desc">Free detector // includes C2PA check</span>
+        <span class="checker-desc">Free detector with C2PA check</span>
       </span>
-      <span class="checker-arrow">&gt;</span>
+      <span class="checker-arrow">&#8250;</span>
     </button>
 
-    <button class="checker-btn" id="checkIlluminarty" title="Detailed AI analysis with probability scores">
-      <span class="checker-icon">[I]</span>
+    <button class="checker-btn" id="checkIlluminarty">
+      <span class="checker-icon">&#128161;</span>
       <span class="checker-info">
         <span class="checker-name">Illuminarty</span>
-        <span class="checker-desc">Probability breakdown // per-model scores</span>
+        <span class="checker-desc">Per-model probability scores</span>
       </span>
-      <span class="checker-arrow">&gt;</span>
+      <span class="checker-arrow">&#8250;</span>
     </button>
 
-    <button class="checker-btn" id="checkSightEngine" title="Content moderation and AI detection API">
-      <span class="checker-icon">[S]</span>
+    <button class="checker-btn" id="checkSightEngine">
+      <span class="checker-icon">&#128065;</span>
       <span class="checker-info">
         <span class="checker-name">SightEngine</span>
-        <span class="checker-desc">AI detection // confidence scoring</span>
+        <span class="checker-desc">AI detection with confidence</span>
       </span>
-      <span class="checker-arrow">&gt;</span>
+      <span class="checker-arrow">&#8250;</span>
     </button>
-
-    <p class="checker-note">* Opens service in new tab. Manual upload may be required.</p>
   </div>
 
-  <!-- Known AI Watermark Systems -->
-  <div class="watermark-info">
-    <h3>Watermark Database</h3>
-
-    <div class="wm-entry">
-      <span class="wm-name">SynthID</span> <span class="wm-by">// Google DeepMind</span>
-      <span class="wm-tag no-public">CLASSIFIED</span>
-      <div class="wm-detail">Pixel-level watermark in Imagen, Gemini, Veo. Survives crop/compress/filter. No public verifier exists.</div>
+  <!-- Watermark Database -->
+  <div class="card">
+    <div class="card-title" style="display: flex; align-items: center; gap: 6px;">
+      Watermark Database
+      <button class="info-btn" id="wmInfoBtn" title="About watermarks">i</button>
+    </div>
+    <div id="wmInfoPanel" class="info-panel">
+      AI image generators may embed invisible watermarks in their output. Most have no public verification tool. The only widely verifiable standard is C2PA Content Credentials.
     </div>
 
     <div class="wm-entry">
-      <span class="wm-name">Content Credentials (C2PA)</span> <span class="wm-by">// Adobe CAI</span>
-      <span class="wm-tag public">PUBLIC</span>
-      <div class="wm-detail">Crypto-signed metadata. Used by Firefly, DALL-E 3, Designer, Leica. Verify at contentcredentials.org. Can be stripped.</div>
+      <div class="wm-header">
+        <span class="wm-name">SynthID</span>
+        <span class="wm-by">Google DeepMind</span>
+        <span class="wm-tag restricted">No public detector</span>
+        <button class="info-btn wm-toggle" data-target="wm-synthid">i</button>
+      </div>
+      <div class="wm-detail" id="wm-synthid">Pixel-level watermark in Imagen, Gemini, and Veo outputs. Survives cropping, compression, and filters. Only Google can verify internally.</div>
     </div>
 
     <div class="wm-entry">
-      <span class="wm-name">Stable Signature</span> <span class="wm-by">// Meta</span>
-      <span class="wm-tag no-public">CLASSIFIED</span>
-      <div class="wm-detail">Invisible watermark baked into SD decoder. Survives JPEG/crop/brightness. No public verification.</div>
+      <div class="wm-header">
+        <span class="wm-name">Content Credentials</span>
+        <span class="wm-by">Adobe / CAI</span>
+        <span class="wm-tag public">Public verifier</span>
+        <button class="info-btn wm-toggle" data-target="wm-c2pa">i</button>
+      </div>
+      <div class="wm-detail" id="wm-c2pa">Crypto-signed metadata used by Firefly, DALL-E 3, Designer, and Leica cameras. Verify at contentcredentials.org. Can be stripped from the file.</div>
     </div>
 
     <div class="wm-entry">
-      <span class="wm-name">DALL-E Metadata</span> <span class="wm-by">// OpenAI</span>
-      <span class="wm-tag public">C2PA</span>
-      <div class="wm-detail">DALL-E 3 / ChatGPT images carry C2PA credentials. Visible stripe can be cropped. Use C2PA checker.</div>
+      <div class="wm-header">
+        <span class="wm-name">Stable Signature</span>
+        <span class="wm-by">Meta</span>
+        <span class="wm-tag restricted">No public detector</span>
+        <button class="info-btn wm-toggle" data-target="wm-meta">i</button>
+      </div>
+      <div class="wm-detail" id="wm-meta">Invisible watermark baked into Stable Diffusion decoder. Survives JPEG compression, cropping, and brightness changes.</div>
     </div>
 
     <div class="wm-entry">
-      <span class="wm-name">PhotoDNA</span> <span class="wm-by">// Microsoft</span>
-      <span class="wm-tag no-public">RESTRICTED</span>
-      <div class="wm-detail">Perceptual hash system for image ID. Law enforcement only. Not an AI watermark.</div>
+      <div class="wm-header">
+        <span class="wm-name">DALL-E Metadata</span>
+        <span class="wm-by">OpenAI</span>
+        <span class="wm-tag public">C2PA verifiable</span>
+        <button class="info-btn wm-toggle" data-target="wm-dalle">i</button>
+      </div>
+      <div class="wm-detail" id="wm-dalle">DALL-E 3 and ChatGPT images include C2PA Content Credentials. Also adds a visible colored stripe that can be cropped.</div>
     </div>
 
     <div class="wm-entry">
-      <span class="wm-name">Digimarc</span> <span class="wm-by">// Digimarc Corp</span>
-      <span class="wm-tag no-public">ENTERPRISE</span>
-      <div class="wm-detail">Commercial invisible watermarking for stock agencies. Survives print/scan. Enterprise license required.</div>
+      <div class="wm-header">
+        <span class="wm-name">PhotoDNA</span>
+        <span class="wm-by">Microsoft</span>
+        <span class="wm-tag restricted">Restricted</span>
+        <button class="info-btn wm-toggle" data-target="wm-photodna">i</button>
+      </div>
+      <div class="wm-detail" id="wm-photodna">Perceptual hash system for image identification. Law enforcement only. Not an AI watermark.</div>
+    </div>
+
+    <div class="wm-entry">
+      <div class="wm-header">
+        <span class="wm-name">Digimarc</span>
+        <span class="wm-by">Digimarc Corp</span>
+        <span class="wm-tag restricted">Enterprise</span>
+        <button class="info-btn wm-toggle" data-target="wm-digimarc">i</button>
+      </div>
+      <div class="wm-detail" id="wm-digimarc">Commercial invisible watermarking for stock agencies. Survives print and scan. Enterprise licensing required.</div>
     </div>
   </div>
 
-  <div class="info" style="margin-top: 12px;">
-    <strong>&gt; USAGE:</strong> Enable analysis mode. Click target image. Overlay renders with selected filter. Adjust parameters in real-time. Cross-reference with external scanners.
+  <div class="footer-info">
+    Enable analysis, click any image on the page. Adjust settings live.
   </div>
 
   <script src="popup.js"></script>

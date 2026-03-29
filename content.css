@@ -1,137 +1,206 @@
-/* ============================================
-   RETRO CRT OVERLAY THEME
-   ============================================ */
-
 @import url('https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap');
+
+/* ============================================
+   DEFAULT / LIGHT THEME
+   ============================================ */
 
 .noise-overlay {
   position: absolute;
   z-index: 999999;
-  border: 2px solid #33ff33;
+  border: 2px solid #007aff;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+  background: #000;
+  pointer-events: auto;
+  border-radius: 4px;
+}
+
+.noise-overlay .close-btn {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #ff3b30;
+  color: white;
+  border: 2px solid white;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000001;
+  pointer-events: auto;
+  transition: transform 0.15s;
+  line-height: 1;
+  padding: 0;
+}
+.noise-overlay .close-btn:hover {
+  transform: scale(1.1);
+}
+
+.noise-analysis-highlight {
+  outline: 2px solid #007aff !important;
+  outline-offset: 2px;
+  cursor: crosshair !important;
+}
+
+.analysis-label {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: rgba(0, 0, 0, 0.7);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  pointer-events: none;
+  z-index: 1000001;
+}
+
+.noise-overlay .check-online-btn {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.7);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: white;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  cursor: pointer;
+  z-index: 1000001;
+  pointer-events: auto;
+  transition: background 0.15s;
+}
+.noise-overlay .check-online-btn:hover {
+  background: rgba(0, 122, 255, 0.85);
+}
+
+.noise-loading {
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif !important;
+  background: rgba(0, 0, 0, 0.8) !important;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  color: white !important;
+  border: none !important;
+  border-radius: 12px !important;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* ============================================
+   DARK THEME
+   ============================================ */
+
+.noise-overlay.theme-dark {
+  border-color: #0a84ff;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+.noise-overlay.theme-dark .close-btn {
+  background: #ff453a;
+  border-color: #2c2c2e;
+}
+
+.noise-overlay.theme-dark .analysis-label {
+  background: rgba(44, 44, 46, 0.85);
+}
+
+.noise-overlay.theme-dark .check-online-btn {
+  background: rgba(44, 44, 46, 0.85);
+}
+.noise-overlay.theme-dark .check-online-btn:hover {
+  background: rgba(10, 132, 255, 0.85);
+}
+
+/* ============================================
+   RETRO THEME
+   ============================================ */
+
+.noise-overlay.theme-retro {
+  border-color: #33ff33;
+  border-radius: 0;
   box-shadow:
     0 0 15px rgba(51, 255, 51, 0.3),
     0 0 30px rgba(51, 255, 51, 0.1),
     inset 0 0 15px rgba(0, 0, 0, 0.5);
-  background: #0a0a0a;
-  pointer-events: auto;
 }
 
-/* Scanline effect on overlay */
-.noise-overlay::after {
+/* Retro scanlines */
+.noise-overlay.theme-retro::after {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 3px,
-    rgba(0, 0, 0, 0.08) 3px,
-    rgba(0, 0, 0, 0.08) 6px
+    0deg, transparent, transparent 3px,
+    rgba(0, 0, 0, 0.08) 3px, rgba(0, 0, 0, 0.08) 6px
   );
   pointer-events: none;
   z-index: 1000000;
 }
 
-/* Close button — retro square style */
-.noise-overlay .close-btn {
-  position: absolute;
-  top: -12px;
-  right: -12px;
-  width: 26px;
-  height: 26px;
+.noise-overlay.theme-retro .close-btn {
   border-radius: 0;
   background: #0a0a0a;
   color: #ff4444;
   border: 2px solid #ff4444;
-  font-size: 16px;
   font-family: 'VT323', 'Courier New', monospace;
-  font-weight: bold;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   box-shadow: 0 0 8px rgba(255, 68, 68, 0.4);
-  z-index: 1000001;
-  pointer-events: auto;
-  transition: all 0.15s;
 }
-
-.noise-overlay .close-btn:hover {
+.noise-overlay.theme-retro .close-btn:hover {
   background: #ff4444;
   color: #0a0a0a;
-  box-shadow: 0 0 12px rgba(255, 68, 68, 0.6);
   transform: none;
 }
 
-/* Highlight on hoverable images */
-.noise-analysis-highlight {
-  outline: 2px solid #33ff33 !important;
-  outline-offset: 2px;
-  cursor: crosshair !important;
-  box-shadow: 0 0 10px rgba(51, 255, 51, 0.2) !important;
-}
-
-/* Analysis label — bottom left */
-.analysis-label {
-  position: absolute;
-  bottom: 8px;
-  left: 8px;
+.noise-overlay.theme-retro .analysis-label {
   background: rgba(10, 10, 10, 0.85);
   color: #33ff33;
-  padding: 4px 10px;
   border: 1px solid #1a9f1a;
-  font-size: 11px;
-  font-weight: bold;
+  border-radius: 0;
   font-family: 'Share Tech Mono', 'Courier New', monospace;
   letter-spacing: 1px;
   text-transform: uppercase;
   text-shadow: 0 0 6px rgba(51, 255, 51, 0.4);
-  pointer-events: none;
-  z-index: 1000001;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
-.analysis-label::before {
+.noise-overlay.theme-retro .analysis-label::before {
   content: '> ';
   color: #1a9f1a;
 }
 
-/* Check Online button — bottom right */
-.noise-overlay .check-online-btn {
-  position: absolute;
-  bottom: 8px;
-  right: 8px;
+.noise-overlay.theme-retro .check-online-btn {
   background: rgba(10, 10, 10, 0.85);
   color: #ffb800;
   border: 1px solid #996e00;
-  padding: 4px 10px;
-  font-size: 11px;
-  font-weight: bold;
+  border-radius: 0;
   font-family: 'Share Tech Mono', 'Courier New', monospace;
   letter-spacing: 1px;
   text-transform: uppercase;
-  cursor: pointer;
-  z-index: 1000001;
-  pointer-events: auto;
-  transition: all 0.15s;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
-
-.noise-overlay .check-online-btn:hover {
+.noise-overlay.theme-retro .check-online-btn:hover {
   background: #ffb800;
   color: #0a0a0a;
   box-shadow: 0 0 10px rgba(255, 184, 0, 0.4);
 }
 
-/* Loading indicator */
-.noise-loading {
-  font-family: 'VT323', 'Courier New', monospace !important;
-  background: rgba(10, 10, 10, 0.95) !important;
-  color: #33ff33 !important;
-  border: 2px solid #33ff33 !important;
-  border-radius: 0 !important;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  text-shadow: 0 0 10px rgba(51, 255, 51, 0.4);
-  box-shadow: 0 0 20px rgba(51, 255, 51, 0.2);
+/* Retro highlight */
+.noise-analysis-highlight.retro-highlight {
+  outline-color: #33ff33 !important;
+  box-shadow: 0 0 10px rgba(51, 255, 51, 0.2) !important;
 }

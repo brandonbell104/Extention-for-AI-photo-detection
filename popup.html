@@ -5,234 +5,189 @@
     @import url('https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap');
 
     :root {
-      --green: #33ff33;
-      --green-dim: #1a9f1a;
-      --green-dark: #0d4f0d;
-      --green-glow: rgba(51, 255, 51, 0.15);
-      --amber: #ffb800;
-      --bg: #0a0a0a;
-      --bg-panel: #0f1a0f;
-      --bg-input: #0a140a;
-      --border: #1a3a1a;
-      --text: #33ff33;
-      --text-dim: #1a9f1a;
+      --bg: #ffffff;
+      --bg-secondary: #f5f5f7;
+      --bg-input: #ffffff;
+      --text: #1d1d1f;
+      --text-secondary: #86868b;
+      --text-tertiary: #aeaeb2;
+      --border: #d2d2d7;
+      --border-light: #e5e5ea;
+      --accent: #007aff;
+      --accent-bg: rgba(0, 122, 255, 0.08);
+      --radius: 10px;
+      --radius-sm: 6px;
+      --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      --font-mono: 'SF Mono', SFMono-Regular, Menlo, monospace;
+      --toggle-bg: #e5e5ea;
+      --toggle-active: #34c759;
+      --slider-track: #e5e5ea;
+      --slider-thumb: #007aff;
+    }
+    [data-theme="dark"] {
+      --bg: #1c1c1e; --bg-secondary: #2c2c2e; --bg-input: #3a3a3c;
+      --text: #f5f5f7; --text-secondary: #98989d; --text-tertiary: #636366;
+      --border: #38383a; --border-light: #48484a;
+      --accent: #0a84ff; --accent-bg: rgba(10,132,255,0.15);
+      --toggle-bg: #636366; --toggle-active: #30d158;
+      --slider-track: #48484a; --slider-thumb: #0a84ff;
+    }
+    [data-theme="retro"] {
+      --bg: #0a0a0a; --bg-secondary: #0f1a0f; --bg-input: #0a140a;
+      --text: #33ff33; --text-secondary: #1a9f1a; --text-tertiary: #0d4f0d;
+      --border: #1a3a1a; --border-light: #1a3a1a;
+      --accent: #33ff33; --accent-bg: rgba(51,255,51,0.08);
+      --radius: 0px; --radius-sm: 0px;
+      --font: 'Share Tech Mono', 'Courier New', monospace;
+      --font-mono: 'VT323', monospace;
+      --toggle-bg: #1a1a1a; --toggle-active: #0d4f0d;
+      --slider-track: #1a1a1a; --slider-thumb: #33ff33;
     }
 
-    * { box-sizing: border-box; }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      width: 300px;
-      padding: 12px;
-      font-family: 'Share Tech Mono', 'Courier New', monospace;
-      margin: 0;
+      width: 280px;
+      padding: 14px;
+      font-family: var(--font);
       background: var(--bg);
       color: var(--text);
-      font-size: 12px;
-      position: relative;
+      font-size: 13px;
+      -webkit-font-smoothing: antialiased;
+      transition: background 0.2s, color 0.2s;
     }
-
-    /* Scanlines */
-    body::before {
+    [data-theme="retro"] body::before {
       content: '';
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: repeating-linear-gradient(
-        0deg, transparent, transparent 2px,
-        rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px
-      );
-      pointer-events: none;
-      z-index: 9999;
+      position: fixed; inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 4px);
+      pointer-events: none; z-index: 9999;
     }
 
-    h2 {
-      margin: 0 0 10px 0;
-      font-family: 'VT323', monospace;
-      font-size: 20px;
-      color: var(--green);
-      text-shadow: 0 0 10px var(--green-glow);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 6px;
-    }
-    h2::before { content: '> '; color: var(--green-dim); }
+    .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border-light); }
+    .header h1 { font-size: 15px; font-weight: 600; }
+    [data-theme="retro"] .header h1 { font-family: 'VT323', monospace; font-size: 20px; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 10px rgba(51,255,51,0.3); }
+    [data-theme="retro"] .header h1::before { content: '> '; color: var(--text-secondary); }
 
-    .toggle-container {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-      padding: 8px;
-      background: var(--bg-panel);
-      border: 1px solid var(--border);
+    .theme-controls { display: flex; gap: 3px; }
+    .theme-btn {
+      width: 24px; height: 24px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: var(--bg-secondary);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-size: 12px; color: var(--text-secondary); padding: 0; transition: all 0.15s;
     }
-    .toggle-container span {
-      color: var(--green);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-size: 11px;
-    }
+    .theme-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .theme-btn.active { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
 
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 52px;
-      height: 24px;
-    }
+    .card { background: var(--bg-secondary); border-radius: var(--radius); padding: 12px; margin-bottom: 10px; }
+    [data-theme="retro"] .card { border: 1px solid var(--border); }
+
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; }
+    .toggle-label { font-size: 14px; font-weight: 500; }
+    [data-theme="retro"] .toggle-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+
+    .switch { position: relative; display: inline-block; width: 51px; height: 31px; }
     .switch input { opacity: 0; width: 0; height: 0; }
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: #1a1a1a;
-      border: 1px solid #333;
-      transition: .3s;
-    }
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 16px;
-      width: 16px;
-      left: 3px;
-      bottom: 3px;
-      background-color: #555;
-      transition: .3s;
-    }
-    input:checked + .slider {
-      background-color: var(--green-dark);
-      border-color: var(--green-dim);
-      box-shadow: 0 0 8px var(--green-glow);
-    }
-    input:checked + .slider:before {
-      transform: translateX(28px);
-      background-color: var(--green);
-      box-shadow: 0 0 6px var(--green);
-    }
+    .slider { position: absolute; cursor: pointer; inset: 0; background: var(--toggle-bg); border-radius: 31px; transition: 0.25s; }
+    .slider::before { position: absolute; content: ""; height: 27px; width: 27px; left: 2px; bottom: 2px; background: white; border-radius: 50%; transition: 0.25s; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+    input:checked + .slider { background: var(--toggle-active); }
+    input:checked + .slider::before { transform: translateX(20px); }
+    [data-theme="retro"] .slider { border-radius: 0; border: 1px solid var(--border); }
+    [data-theme="retro"] .slider::before { border-radius: 0; width: 23px; height: 25px; left: 2px; }
+    [data-theme="retro"] input:checked + .slider { box-shadow: 0 0 8px rgba(51,255,51,0.2); border-color: var(--text-secondary); }
+    [data-theme="retro"] input:checked + .slider::before { background: var(--accent); box-shadow: 0 0 6px var(--accent); border-radius: 0; }
 
-    .controls {
-      margin-top: 10px;
-      padding: 10px;
-      background: var(--bg-panel);
-      border: 1px solid var(--border);
-    }
-
-    label {
-      display: block;
-      margin-bottom: 4px;
-      font-size: 11px;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
+    .form-group { margin-bottom: 10px; }
+    .form-group:last-child { margin-bottom: 0; }
+    .form-label { display: flex; align-items: center; font-size: 12px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+    .form-value { font-size: 12px; color: var(--text-secondary); font-family: var(--font-mono); margin-left: auto; }
 
     select {
-      width: 100%;
-      margin-bottom: 8px;
-      padding: 5px 6px;
-      background: var(--bg-input);
-      color: var(--green);
-      border: 1px solid var(--border);
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 11px;
-      cursor: pointer;
-      outline: none;
+      width: 100%; padding: 6px 8px; background: var(--bg-input); color: var(--text);
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      font-family: var(--font); font-size: 12px; outline: none; cursor: pointer;
     }
-    select:focus {
-      border-color: var(--green-dim);
-      box-shadow: 0 0 6px var(--green-glow);
-    }
-    select option { background: var(--bg); color: var(--green); }
+    select:focus { border-color: var(--accent); }
+    select option { background: var(--bg); color: var(--text); }
 
     input[type="range"] {
-      width: 100%;
-      margin-bottom: 8px;
-      -webkit-appearance: none;
-      appearance: none;
-      height: 6px;
-      background: var(--bg-input);
-      border: 1px solid var(--border);
-      outline: none;
+      width: 100%; -webkit-appearance: none; appearance: none;
+      height: 4px; background: var(--slider-track); border-radius: 2px; outline: none; margin: 2px 0;
     }
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 12px; height: 12px;
-      background: var(--green);
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 0 6px var(--green);
-    }
-    input[type="range"]::-moz-range-thumb {
-      width: 12px; height: 12px;
-      background: var(--green);
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 0 6px var(--green);
-    }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: var(--slider-thumb); border-radius: 50%; cursor: pointer; }
+    input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; background: var(--slider-thumb); border-radius: 50%; border: none; cursor: pointer; }
+    [data-theme="retro"] input[type="range"] { border-radius: 0; height: 6px; border: 1px solid var(--border); background: var(--bg-input); }
+    [data-theme="retro"] input[type="range"]::-webkit-slider-thumb { border-radius: 0; width: 14px; height: 14px; box-shadow: 0 0 6px var(--accent); }
+    [data-theme="retro"] input[type="range"]::-moz-range-thumb { border-radius: 0; width: 14px; height: 14px; box-shadow: 0 0 6px var(--accent); }
 
-    .value-display {
-      font-size: 11px;
-      color: var(--amber);
-    }
+    input[type="checkbox"] { accent-color: var(--accent); }
+    #fftControls { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-light); }
 
-    input[type="checkbox"] { accent-color: var(--green); }
-
-    .info {
-      margin-top: 10px;
-      padding: 8px;
-      background: var(--bg-panel);
-      border-left: 2px solid var(--green-dim);
-      font-size: 10px;
-      color: var(--text-dim);
-    }
+    .footer { margin-top: 8px; font-size: 11px; color: var(--text-tertiary); text-align: center; }
   </style>
 </head>
 <body>
-  <h2>NOISE ANALYZER</h2>
-
-  <div class="toggle-container">
-    <span>[ANALYSIS MODE]</span>
-    <label class="switch">
-      <input type="checkbox" id="toggleAnalysis">
-      <span class="slider"></span>
-    </label>
+  <div class="header">
+    <h1>Noise Analyzer</h1>
+    <div class="theme-controls">
+      <button class="theme-btn active" id="themeLight" title="Light">&#9788;</button>
+      <button class="theme-btn" id="themeDark" title="Dark">&#9790;</button>
+      <button class="theme-btn" id="themeRetro" title="Retro">&#9741;</button>
+    </div>
   </div>
 
-  <div class="controls">
-    <label for="analysisType">&gt; Analysis Type:</label>
-    <select id="analysisType">
-      <option value="noise">NOISE PATTERN (HIGH-PASS)</option>
-      <option value="periodic">PERIODIC PATTERNS (AI DETECT)</option>
-      <option value="fft">FFT ANALYSIS (FARID METHOD)</option>
-      <option value="ela">ERROR LEVEL ANALYSIS</option>
-      <option value="gradient">GRADIENT MAGNITUDE</option>
-    </select>
+  <div class="card">
+    <div class="toggle-row">
+      <span class="toggle-label">Analysis Mode</span>
+      <label class="switch">
+        <input type="checkbox" id="toggleAnalysis">
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
 
-    <label for="sensitivity">&gt; Sensitivity: <span class="value-display" id="sensValue">3x</span></label>
-    <input type="range" id="sensitivity" min="1" max="10" value="3">
+  <div class="card">
+    <div class="form-group">
+      <div class="form-label">Analysis Type</div>
+      <select id="analysisType">
+        <option value="noise">Noise Pattern (High-pass)</option>
+        <option value="periodic">Periodic Patterns (AI Detection)</option>
+        <option value="fft">FFT Noise Analysis (Farid Method)</option>
+        <option value="ela">Error Level Analysis (ELA)</option>
+        <option value="gradient">Gradient Magnitude</option>
+      </select>
+    </div>
 
-    <label for="opacity">&gt; Opacity: <span class="value-display" id="opacityValue">100%</span></label>
-    <input type="range" id="opacity" min="0" max="100" value="100">
+    <div class="form-group">
+      <div class="form-label">Sensitivity <span class="form-value" id="sensValue">3x</span></div>
+      <input type="range" id="sensitivity" min="1" max="10" value="3">
+    </div>
+
+    <div class="form-group">
+      <div class="form-label">Opacity <span class="form-value" id="opacityValue">100%</span></div>
+      <input type="range" id="opacity" min="0" max="100" value="100">
+    </div>
 
     <div id="fftControls" style="display: none;">
-      <label for="gaussianSigma">&gt; Gaussian sigma: <span class="value-display" id="sigmaValue">1.2</span></label>
-      <input type="range" id="gaussianSigma" min="5" max="30" value="12" step="1">
-
-      <label>
-        <input type="checkbox" id="showDebug"> Show Debug Layers
+      <div class="form-group">
+        <div class="form-label">Gaussian Sigma <span class="form-value" id="sigmaValue">1.2</span></div>
+        <input type="range" id="gaussianSigma" min="5" max="30" value="12" step="1">
+      </div>
+      <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer;">
+        <input type="checkbox" id="showDebug" style="width: auto;">
+        Debug Layers
       </label>
     </div>
 
-    <label for="colorMap">&gt; Color Map:</label>
-    <select id="colorMap">
-      <option value="grayscale">GRAYSCALE</option>
-      <option value="heat">HEAT MAP</option>
-      <option value="rainbow">RAINBOW</option>
-    </select>
+    <div class="form-group">
+      <div class="form-label">Color Map</div>
+      <select id="colorMap">
+        <option value="grayscale">Grayscale</option>
+        <option value="heat">Heat Map</option>
+        <option value="rainbow">Rainbow</option>
+      </select>
+    </div>
   </div>
 
-  <div class="info">
-    Click any image to analyze. Use the side panel for full controls and AI checkers.
-  </div>
+  <div class="footer">Open side panel for full controls &amp; AI checkers</div>
 
   <script src="popup.js"></script>
 </body>
