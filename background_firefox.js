@@ -18,6 +18,11 @@ browser.runtime.onMessage.addListener((request, sender) => {
     return;
   }
 
+  if (request.action === 'captureTab') {
+    return browser.tabs.captureVisibleTab(null, { format: 'png' })
+      .then(dataUrl => ({ dataUrl }));
+  }
+
   // Relay messages from content script to sidebar
   if (request.action === 'imageAnalyzed' || request.action === 'overlayRemoved') {
     browser.runtime.sendMessage(request).catch(() => {});

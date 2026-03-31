@@ -14,9 +14,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 
   if (request.action === 'openChecker') {
-    // Open an online checker service in a new tab
     chrome.tabs.create({ url: request.url });
     return false;
+  }
+
+  if (request.action === 'captureTab') {
+    chrome.tabs.captureVisibleTab(null, { format: 'png' }, (dataUrl) => {
+      sendResponse({ dataUrl });
+    });
+    return true; // async
   }
 
   // Relay messages from content script to side panel (and vice versa)

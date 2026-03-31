@@ -148,15 +148,15 @@
     <div class="form-group">
       <div class="form-label">Analysis Type</div>
       <select id="analysisType">
-        <option value="noise">Noise Pattern (High-pass)</option>
-        <option value="periodic">Periodic Patterns (AI Detection)</option>
-        <option value="fft">FFT Noise Analysis (Farid Method)</option>
-        <option value="ela">Error Level Analysis (ELA)</option>
-        <option value="gradient">Gradient Magnitude</option>
+        <option value="noise">Noise Pattern (Sensor Noise)</option>
+        <option value="periodic">Periodic Patterns (AI Artifacts)</option>
+        <option value="fft">FFT Analysis (Frequency Forensics)</option>
+        <option value="ela">Error Level Analysis (Splice Detection)</option>
+        <option value="gradient">Gradient Analysis (Edge Anomalies)</option>
       </select>
     </div>
 
-    <div class="form-group">
+    <div class="form-group" id="sensitivityGroup">
       <div class="form-label">Sensitivity <span class="form-value" id="sensValue">3x</span></div>
       <input type="range" id="sensitivity" min="1" max="10" value="3">
     </div>

@@ -49,7 +49,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
   } else if (request.action === 'updateTheme') {
     currentTheme = request.theme;
-    // Update existing overlay if present
     const overlay = document.getElementById('noise-analysis-overlay');
     if (overlay) {
       overlay.classList.remove('theme-light', 'theme-dark', 'theme-retro');
@@ -57,6 +56,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         overlay.classList.add('theme-' + currentTheme);
       }
     }
+  } else if (request.action === 'startCrop') {
+    startScreenCrop(request.screenshot);
   }
 });
 
@@ -950,10 +951,206 @@ function removeOverlay() {
   if (existing) {
     existing.remove();
   }
-  // Clear stored data when overlay is removed
   currentImageData = null;
   currentDisplayElement = null;
-
-  // Notify side panel
   chrome.runtime.sendMessage({ action: 'overlayRemoved' }).catch(() => {});
+}
+
+// ============================================================================
+// SCREEN REGION CAPTURE & CROP TOOL
+// ============================================================================
+
+function startScreenCrop(screenshotDataUrl) {
+  // Remove any existing crop UI
+  const existing = document.getElementById('noise-crop-overlay');
+  if (existing) existing.remove();
+
+  const cropOverlay = document.createElement('div');
+  cropOverlay.id = 'noise-crop-overlay';
+  cropOverlay.style.cssText = `
+    position: fixed; inset: 0; z-index: 9999998;
+    cursor: crosshair; background: transparent;
+  `;
+
+  // Screenshot as background
+  const bgImg = document.createElement('img');
+  bgImg.src = screenshotDataUrl;
+  bgImg.style.cssText = 'position:absolute; inset:0; width:100%; height:100%; object-fit:cover; pointer-events:none;';
+  cropOverlay.appendChild(bgImg);
+
+  // Dimming layer
+  const dim = document.createElement('div');
+  dim.style.cssText = 'position:absolute; inset:0; background:rgba(0,0,0,0.4); pointer-events:none;';
+  cropOverlay.appendChild(dim);
+
+  // Selection rectangle
+  const selBox = document.createElement('div');
+  selBox.style.cssText = `
+    position:absolute; border:2px solid #007aff; background:transparent;
+    display:none; pointer-events:none; z-index:2;
+    box-shadow: 0 0 0 9999px rgba(0,0,0,0.4);
+  `;
+  cropOverlay.appendChild(selBox);
+
+  // Instructions
+  const hint = document.createElement('div');
+  hint.textContent = 'Click and drag to select a region. Press Escape to cancel.';
+  hint.style.cssText = `
+    position:fixed; top:20px; left:50%; transform:translateX(-50%);
+    background:rgba(0,0,0,0.75); color:white; padding:8px 16px;
+    border-radius:8px; font:13px/1.4 -apple-system,BlinkMacSystemFont,sans-serif;
+    z-index:3; pointer-events:none;
+  `;
+  cropOverlay.appendChild(hint);
+
+  let startX, startY, dragging = false;
+
+  cropOverlay.addEventListener('mousedown', (e) => {
+    startX = e.clientX;
+    startY = e.clientY;
+    dragging = true;
+    dim.style.display = 'none';
+    selBox.style.display = 'block';
+    selBox.style.left = startX + 'px';
+    selBox.style.top = startY + 'px';
+    selBox.style.width = '0px';
+    selBox.style.height = '0px';
+    e.preventDefault();
+  });
+
+  cropOverlay.addEventListener('mousemove', (e) => {
+    if (!dragging) return;
+    const x = Math.min(e.clientX, startX);
+    const y = Math.min(e.clientY, startY);
+    const w = Math.abs(e.clientX - startX);
+    const h = Math.abs(e.clientY - startY);
+    selBox.style.left = x + 'px';
+    selBox.style.top = y + 'px';
+    selBox.style.width = w + 'px';
+    selBox.style.height = h + 'px';
+  });
+
+  cropOverlay.addEventListener('mouseup', (e) => {
+    if (!dragging) return;
+    dragging = false;
+
+    const x = Math.min(e.clientX, startX);
+    const y = Math.min(e.clientY, startY);
+    const w = Math.abs(e.clientX - startX);
+    const h = Math.abs(e.clientY - startY);
+
+    cropOverlay.remove();
+
+    if (w < 10 || h < 10) return; // Too small, ignore
+
+    // Crop the screenshot at the selected region
+    const img = new Image();
+    img.onload = () => {
+      // Account for device pixel ratio
+      const dpr = window.devicePixelRatio || 1;
+      const canvas = document.createElement('canvas');
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      const ctx = canvas.getContext('2d');
+
+      // The screenshot is at the full capture resolution
+      const scaleX = img.naturalWidth / window.innerWidth;
+      const scaleY = img.naturalHeight / window.innerHeight;
+
+      ctx.drawImage(img,
+        x * scaleX, y * scaleY, w * scaleX, h * scaleY,
+        0, 0, canvas.width, canvas.height
+      );
+
+      // Create a virtual element positioned at the crop region for the overlay
+      const placeholder = document.createElement('div');
+      placeholder.style.cssText = `
+        position:fixed; left:${x}px; top:${y}px;
+        width:${w}px; height:${h}px; pointer-events:none;
+      `;
+      document.body.appendChild(placeholder);
+
+      // Get the image data and analyze it
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      currentImageData = imageData;
+      currentDisplayElement = placeholder;
+
+      const analyzed = performAnalysis(imageData);
+      const outCanvas = document.createElement('canvas');
+      outCanvas.width = canvas.width;
+      outCanvas.height = canvas.height;
+      const outCtx = outCanvas.getContext('2d');
+      outCtx.putImageData(analyzed, 0, 0);
+
+      removeOverlay();
+      currentImageData = imageData;
+      currentDisplayElement = placeholder;
+
+      // Create overlay using absolute positioning
+      const overlay = document.createElement('div');
+      overlay.id = 'noise-analysis-overlay';
+      overlay.className = 'noise-overlay' + (currentTheme !== 'light' ? ' theme-' + currentTheme : '');
+      overlay.style.position = 'fixed';
+      overlay.style.left = x + 'px';
+      overlay.style.top = y + 'px';
+      overlay.style.width = w + 'px';
+      overlay.style.height = h + 'px';
+
+      // Original crop
+      const origImg = document.createElement('img');
+      origImg.src = canvas.toDataURL();
+      origImg.style.cssText = 'position:absolute; inset:0; width:100%; height:100%; object-fit:fill;';
+
+      // Analysis layer
+      const analysisImg = document.createElement('img');
+      analysisImg.src = outCanvas.toDataURL();
+      analysisImg.style.cssText = `position:absolute; inset:0; width:100%; height:100%; object-fit:fill; opacity:${settings.opacity / 100};`;
+
+      const closeBtn = document.createElement('button');
+      closeBtn.textContent = '\u00d7';
+      closeBtn.className = 'close-btn';
+      closeBtn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        removeOverlay();
+        placeholder.remove();
+        return false;
+      };
+
+      const label = document.createElement('div');
+      label.className = 'analysis-label';
+      label.textContent = `${settings.analysisType.toUpperCase()} Analysis (${settings.sensitivity}x)`;
+
+      overlay.appendChild(origImg);
+      overlay.appendChild(analysisImg);
+      overlay.appendChild(closeBtn);
+      overlay.appendChild(label);
+
+      overlay.addEventListener('click', (e) => {
+        if (e.target.closest('.close-btn')) return;
+        e.stopPropagation();
+        e.preventDefault();
+      });
+
+      document.body.appendChild(overlay);
+
+      chrome.runtime.sendMessage({
+        action: 'imageAnalyzed',
+        imageUrl: '(screen capture)'
+      }).catch(() => {});
+    };
+    img.src = screenshotDataUrl;
+  });
+
+  // Escape to cancel
+  const escHandler = (e) => {
+    if (e.key === 'Escape') {
+      cropOverlay.remove();
+      document.removeEventListener('keydown', escHandler);
+    }
+  };
+  document.addEventListener('keydown', escHandler);
+
+  document.body.appendChild(cropOverlay);
 }

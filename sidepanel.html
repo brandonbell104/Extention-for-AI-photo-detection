@@ -380,8 +380,8 @@
     }
     .info-panel .info-warn { color: var(--danger); font-weight: 600; }
 
-    /* ---- Checker buttons ---- */
-    .checker-btn {
+    /* ---- Link buttons (unified for scanners + watermarks) ---- */
+    .link-btn {
       display: flex;
       align-items: center;
       width: 100%;
@@ -397,50 +397,52 @@
       color: var(--text);
       transition: all 0.15s;
     }
-    .checker-btn:last-of-type { margin-bottom: 0; }
-    .checker-btn:hover { border-color: var(--accent); background: var(--accent-bg); }
-    .checker-icon { margin-right: 10px; font-size: 15px; flex-shrink: 0; }
-    .checker-info { flex: 1; min-width: 0; }
-    .checker-name { font-weight: 600; font-size: 13px; }
-    .checker-desc { font-size: 11px; color: var(--text-secondary); margin-top: 1px; }
-    .checker-arrow { color: var(--text-tertiary); font-size: 16px; margin-left: 8px; }
-    [data-theme="retro"] .checker-btn .checker-icon { font-family: var(--font); }
+    .link-btn:last-of-type { margin-bottom: 0; }
+    .link-btn:hover { border-color: var(--accent); background: var(--accent-bg); }
+    .link-btn .link-icon { margin-right: 10px; font-size: 15px; flex-shrink: 0; }
+    .link-btn .link-info { flex: 1; min-width: 0; }
+    .link-btn .link-name { font-weight: 600; font-size: 13px; }
+    .link-btn .link-desc { font-size: 11px; color: var(--text-secondary); margin-top: 1px; }
+    .link-btn .link-tag {
+      font-size: 9px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.5px; padding: 1px 5px; border-radius: 3px; margin-left: 6px;
+    }
+    .link-btn .link-tag.public { background: var(--tag-public-bg); color: var(--tag-public-text); }
+    .link-btn .link-tag.restricted { background: var(--tag-restricted-bg); color: var(--tag-restricted-text); }
+    [data-theme="retro"] .link-btn .link-tag { border-radius: 0; }
+    .link-btn .link-arrow { color: var(--text-tertiary); font-size: 16px; margin-left: 8px; }
+    .link-btn.disabled { opacity: 0.5; cursor: default; }
+    .link-btn.disabled:hover { border-color: var(--border-light); background: var(--bg); }
+    [data-theme="retro"] .link-btn .link-icon { font-family: var(--font); }
 
-    .checker-status {
-      font-size: 12px;
-      color: var(--text-tertiary);
-      text-align: center;
-      padding: 6px 0 10px;
+    .section-divider {
+      font-size: 10px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.5px; color: var(--text-tertiary);
+      margin: 12px 0 8px; padding-top: 10px;
+      border-top: 1px solid var(--border-light);
     }
+    .section-divider:first-of-type { border-top: none; margin-top: 4px; padding-top: 0; }
 
-    /* ---- Watermark entries ---- */
-    .wm-entry {
-      padding: 8px 0;
-      border-bottom: 1px solid var(--border-light);
-      font-size: 12px;
+    /* ---- Capture button ---- */
+    .capture-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 10px;
+      background: var(--accent-bg);
+      border: 1px dashed var(--accent);
+      border-radius: var(--radius-sm);
+      color: var(--accent);
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
     }
-    .wm-entry:last-child { border-bottom: none; padding-bottom: 0; }
-    .wm-header { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-    .wm-name { font-weight: 600; color: var(--text); }
-    .wm-by { color: var(--text-tertiary); font-size: 11px; }
-    .wm-tag {
-      font-size: 9px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      padding: 1px 5px;
-      border-radius: 3px;
-    }
-    .wm-tag.public { background: var(--tag-public-bg); color: var(--tag-public-text); }
-    .wm-tag.restricted { background: var(--tag-restricted-bg); color: var(--tag-restricted-text); }
-    [data-theme="retro"] .wm-tag { border-radius: 0; }
-    .wm-detail {
-      display: none;
-      margin-top: 4px;
-      color: var(--text-secondary);
-      line-height: 1.5;
-    }
-    .wm-detail.open { display: block; }
+    .capture-btn:hover { background: var(--accent); color: var(--bg); }
+    [data-theme="retro"] .capture-btn { border-style: solid; }
 
     /* ---- Footer info ---- */
     .footer-info {
@@ -477,6 +479,14 @@
     </div>
   </div>
 
+  <!-- Screen Capture -->
+  <div class="card">
+    <button class="capture-btn" id="captureRegionBtn">
+      <span>&#9986;</span>
+      Capture Screen Region
+    </button>
+  </div>
+
   <!-- Controls -->
   <div class="card">
     <div class="card-title">Filter Settings</div>
@@ -487,16 +497,16 @@
         <button class="info-btn" id="filterInfoBtn" title="About this filter">i</button>
       </div>
       <select id="analysisType">
-        <option value="noise">Noise Pattern (High-pass)</option>
-        <option value="periodic">Periodic Patterns (AI Detection)</option>
-        <option value="fft">FFT Noise Analysis (Farid Method)</option>
-        <option value="ela">Error Level Analysis (ELA)</option>
-        <option value="gradient">Gradient Magnitude</option>
+        <option value="noise">Noise Pattern (Sensor Noise)</option>
+        <option value="periodic">Periodic Patterns (AI Artifacts)</option>
+        <option value="fft">FFT Analysis (Frequency Forensics)</option>
+        <option value="ela">Error Level Analysis (Splice Detection)</option>
+        <option value="gradient">Gradient Analysis (Edge Anomalies)</option>
       </select>
       <div id="filterHelp" class="info-panel"></div>
     </div>
 
-    <div class="form-group">
+    <div class="form-group" id="sensitivityGroup">
       <div class="form-label">Sensitivity <span class="form-value" id="sensValue">3x</span></div>
       <input type="range" id="sensitivity" min="1" max="10" value="3">
     </div>
@@ -527,137 +537,98 @@
     </div>
   </div>
 
-  <!-- Online Checkers -->
+  <!-- Unified: Watermarks & Online Verification -->
   <div class="card">
     <div class="card-title" style="display: flex; align-items: center; gap: 6px;">
-      External Scanners
-      <button class="info-btn" id="checkerInfoBtn" title="About online checkers">i</button>
-    </div>
-    <div id="checkerInfoPanel" class="info-panel">
-      These services use machine learning and metadata analysis to detect AI-generated images. Click any button to open the service in a new tab where you can upload the image for analysis. Results vary — use multiple for best accuracy.
-    </div>
-
-    <p id="checkerStatus" class="checker-status">Select an image first to enable scanning</p>
-
-    <button class="checker-btn" id="checkC2PA">
-      <span class="checker-icon">&#128274;</span>
-      <span class="checker-info">
-        <span class="checker-name">Content Credentials</span>
-        <span class="checker-desc">C2PA provenance metadata</span>
-      </span>
-      <span class="checker-arrow">&#8250;</span>
-    </button>
-
-    <button class="checker-btn" id="checkHive">
-      <span class="checker-icon">&#129302;</span>
-      <span class="checker-info">
-        <span class="checker-name">Hive AI Detector</span>
-        <span class="checker-desc">ML classifier for AI images</span>
-      </span>
-      <span class="checker-arrow">&#8250;</span>
-    </button>
-
-    <button class="checker-btn" id="checkAIOrNot">
-      <span class="checker-icon">&#128269;</span>
-      <span class="checker-info">
-        <span class="checker-name">AI or Not</span>
-        <span class="checker-desc">Free detector with C2PA check</span>
-      </span>
-      <span class="checker-arrow">&#8250;</span>
-    </button>
-
-    <button class="checker-btn" id="checkIlluminarty">
-      <span class="checker-icon">&#128161;</span>
-      <span class="checker-info">
-        <span class="checker-name">Illuminarty</span>
-        <span class="checker-desc">Per-model probability scores</span>
-      </span>
-      <span class="checker-arrow">&#8250;</span>
-    </button>
-
-    <button class="checker-btn" id="checkSightEngine">
-      <span class="checker-icon">&#128065;</span>
-      <span class="checker-info">
-        <span class="checker-name">SightEngine</span>
-        <span class="checker-desc">AI detection with confidence</span>
-      </span>
-      <span class="checker-arrow">&#8250;</span>
-    </button>
-  </div>
-
-  <!-- Watermark Database -->
-  <div class="card">
-    <div class="card-title" style="display: flex; align-items: center; gap: 6px;">
-      Watermark Database
-      <button class="info-btn" id="wmInfoBtn" title="About watermarks">i</button>
+      Watermark &amp; AI Detection
+      <button class="info-btn" id="wmInfoBtn" title="About this section">i</button>
     </div>
     <div id="wmInfoPanel" class="info-panel">
-      AI image generators may embed invisible watermarks in their output. Most have no public verification tool. The only widely verifiable standard is C2PA Content Credentials.
+      AI generators embed invisible watermarks or metadata in their output. Entries marked PUBLIC have a free online verifier you can click to open. ML-based detectors use neural networks to classify images regardless of watermarks. Use multiple for best accuracy.
     </div>
 
-    <div class="wm-entry">
-      <div class="wm-header">
-        <span class="wm-name">SynthID</span>
-        <span class="wm-by">Google DeepMind</span>
-        <span class="wm-tag restricted">No public detector</span>
-        <button class="info-btn wm-toggle" data-target="wm-synthid">i</button>
-      </div>
-      <div class="wm-detail" id="wm-synthid">Pixel-level watermark in Imagen, Gemini, and Veo outputs. Survives cropping, compression, and filters. Only Google can verify internally.</div>
-    </div>
+    <!-- Watermark Verifiers (clickable) -->
+    <div class="section-divider">Watermark Verifiers</div>
 
-    <div class="wm-entry">
-      <div class="wm-header">
-        <span class="wm-name">Content Credentials</span>
-        <span class="wm-by">Adobe / CAI</span>
-        <span class="wm-tag public">Public verifier</span>
-        <button class="info-btn wm-toggle" data-target="wm-c2pa">i</button>
-      </div>
-      <div class="wm-detail" id="wm-c2pa">Crypto-signed metadata used by Firefly, DALL-E 3, Designer, and Leica cameras. Verify at contentcredentials.org. Can be stripped from the file.</div>
-    </div>
+    <button class="link-btn" id="checkC2PA">
+      <span class="link-icon">&#128274;</span>
+      <span class="link-info">
+        <span class="link-name">Content Credentials (C2PA)</span>
+        <span class="link-desc">Adobe Firefly, DALL-E 3, Microsoft Designer, Leica</span>
+      </span>
+      <span class="link-tag public">Public</span>
+      <span class="link-arrow">&#8250;</span>
+    </button>
 
-    <div class="wm-entry">
-      <div class="wm-header">
-        <span class="wm-name">Stable Signature</span>
-        <span class="wm-by">Meta</span>
-        <span class="wm-tag restricted">No public detector</span>
-        <button class="info-btn wm-toggle" data-target="wm-meta">i</button>
-      </div>
-      <div class="wm-detail" id="wm-meta">Invisible watermark baked into Stable Diffusion decoder. Survives JPEG compression, cropping, and brightness changes.</div>
-    </div>
+    <button class="link-btn disabled" title="Google has no public SynthID verifier">
+      <span class="link-icon">&#127912;</span>
+      <span class="link-info">
+        <span class="link-name">SynthID</span>
+        <span class="link-desc">Google Imagen, Gemini, Veo</span>
+      </span>
+      <span class="link-tag restricted">No verifier</span>
+    </button>
 
-    <div class="wm-entry">
-      <div class="wm-header">
-        <span class="wm-name">DALL-E Metadata</span>
-        <span class="wm-by">OpenAI</span>
-        <span class="wm-tag public">C2PA verifiable</span>
-        <button class="info-btn wm-toggle" data-target="wm-dalle">i</button>
-      </div>
-      <div class="wm-detail" id="wm-dalle">DALL-E 3 and ChatGPT images include C2PA Content Credentials. Also adds a visible colored stripe that can be cropped.</div>
-    </div>
+    <button class="link-btn disabled" title="Meta has no public Stable Signature verifier">
+      <span class="link-icon">&#127752;</span>
+      <span class="link-info">
+        <span class="link-name">Stable Signature</span>
+        <span class="link-desc">Meta / Stable Diffusion</span>
+      </span>
+      <span class="link-tag restricted">No verifier</span>
+    </button>
 
-    <div class="wm-entry">
-      <div class="wm-header">
-        <span class="wm-name">PhotoDNA</span>
-        <span class="wm-by">Microsoft</span>
-        <span class="wm-tag restricted">Restricted</span>
-        <button class="info-btn wm-toggle" data-target="wm-photodna">i</button>
-      </div>
-      <div class="wm-detail" id="wm-photodna">Perceptual hash system for image identification. Law enforcement only. Not an AI watermark.</div>
-    </div>
+    <button class="link-btn disabled" title="Enterprise licensing required">
+      <span class="link-icon">&#128196;</span>
+      <span class="link-info">
+        <span class="link-name">Digimarc</span>
+        <span class="link-desc">Stock photo agencies, publishers</span>
+      </span>
+      <span class="link-tag restricted">Enterprise</span>
+    </button>
 
-    <div class="wm-entry">
-      <div class="wm-header">
-        <span class="wm-name">Digimarc</span>
-        <span class="wm-by">Digimarc Corp</span>
-        <span class="wm-tag restricted">Enterprise</span>
-        <button class="info-btn wm-toggle" data-target="wm-digimarc">i</button>
-      </div>
-      <div class="wm-detail" id="wm-digimarc">Commercial invisible watermarking for stock agencies. Survives print and scan. Enterprise licensing required.</div>
-    </div>
+    <!-- ML Detectors (clickable) -->
+    <div class="section-divider">AI Detection (ML-Based)</div>
+
+    <button class="link-btn" id="checkHive">
+      <span class="link-icon">&#129302;</span>
+      <span class="link-info">
+        <span class="link-name">Hive AI Detector</span>
+        <span class="link-desc">DALL-E, Midjourney, Stable Diffusion classifier</span>
+      </span>
+      <span class="link-arrow">&#8250;</span>
+    </button>
+
+    <button class="link-btn" id="checkAIOrNot">
+      <span class="link-icon">&#128269;</span>
+      <span class="link-info">
+        <span class="link-name">AI or Not</span>
+        <span class="link-desc">Free detector with C2PA check</span>
+      </span>
+      <span class="link-arrow">&#8250;</span>
+    </button>
+
+    <button class="link-btn" id="checkIlluminarty">
+      <span class="link-icon">&#128161;</span>
+      <span class="link-info">
+        <span class="link-name">Illuminarty</span>
+        <span class="link-desc">Per-model probability breakdown</span>
+      </span>
+      <span class="link-arrow">&#8250;</span>
+    </button>
+
+    <button class="link-btn" id="checkSightEngine">
+      <span class="link-icon">&#128065;</span>
+      <span class="link-info">
+        <span class="link-name">SightEngine</span>
+        <span class="link-desc">AI detection with confidence scores</span>
+      </span>
+      <span class="link-arrow">&#8250;</span>
+    </button>
   </div>
 
   <div class="footer-info">
-    Enable analysis, click any image on the page. Adjust settings live.
+    Enable analysis, click any image or capture a screen region. Adjust settings live.
   </div>
 
   <script src="popup.js"></script>
