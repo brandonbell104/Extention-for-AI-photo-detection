@@ -316,8 +316,92 @@ if (captureBtn) {
 }
 
 // ============================================================================
+// Ad Banner
+// ============================================================================
+
+const AD_ROTATION = [
+  {
+    icon: '\u{1F4F7}',
+    title: 'Your Ad Here',
+    desc: 'Reach users who care about image authenticity',
+    url: '#'
+  },
+  {
+    icon: '\u{1F6E1}',
+    title: 'Your Ad Here',
+    desc: 'Advertise to security-conscious photographers',
+    url: '#'
+  },
+  {
+    icon: '\u{1F3A8}',
+    title: 'Your Ad Here',
+    desc: 'Connect with digital forensics professionals',
+    url: '#'
+  }
+];
+
+function initAdBanner() {
+  const banner = document.getElementById('adBanner');
+  if (!banner) return;
+
+  chrome.storage.sync.get(['isPro', 'adDismissedUntil'], (data) => {
+    // Pro users never see ads
+    if (data.isPro) {
+      banner.classList.add('hidden');
+      return;
+    }
+
+    // Temporarily dismissed (lasts 24 hours)
+    if (data.adDismissedUntil && Date.now() < data.adDismissedUntil) {
+      banner.classList.add('hidden');
+      return;
+    }
+
+    // Pick a random ad
+    const ad = AD_ROTATION[Math.floor(Math.random() * AD_ROTATION.length)];
+    document.getElementById('adIcon').textContent = ad.icon;
+    document.getElementById('adTitle').textContent = ad.title;
+    document.getElementById('adDesc').textContent = ad.desc;
+    const adLink = document.getElementById('adLink');
+    adLink.href = ad.url;
+    if (ad.url === '#') adLink.removeAttribute('href');
+
+    banner.classList.remove('hidden');
+  });
+
+  // Close button — dismiss for 24 hours
+  const closeBtn = document.getElementById('adCloseBtn');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const dismissUntil = Date.now() + 24 * 60 * 60 * 1000;
+      chrome.storage.sync.set({ adDismissedUntil: dismissUntil });
+      banner.classList.add('hidden');
+    });
+  }
+
+  // Upgrade button
+  const upgradeBtn = document.getElementById('adUpgradeBtn');
+  if (upgradeBtn) {
+    upgradeBtn.addEventListener('click', () => {
+      // TODO: Replace with your payment link (Stripe, Gumroad, etc.)
+      chrome.tabs.create({ url: 'https://your-payment-page.com/pro' });
+    });
+  }
+}
+
+// Callable from payment callback to activate pro
+function activatePro() {
+  chrome.storage.sync.set({ isPro: true });
+  const banner = document.getElementById('adBanner');
+  if (banner) banner.classList.add('hidden');
+}
+
+// ============================================================================
 // Init
 // ============================================================================
 
 initThemeButtons();
 initInfoToggles();
+initAdBanner();
