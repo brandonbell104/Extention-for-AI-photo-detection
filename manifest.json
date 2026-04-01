@@ -3,7 +3,7 @@
   "name": "Image Noise Pattern Analyzer",
   "version": "1.0",
   "description": "Visualizes sensor noise patterns in images to detect potential manipulation",
-  "permissions": ["activeTab", "storage", "sidePanel"],
+  "permissions": ["activeTab", "storage", "sidePanel", "downloads"],
   "host_permissions": ["<all_urls>"],
   "background": {
     "service_worker": "background.js"

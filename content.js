@@ -916,10 +916,11 @@ function createOverlay(targetElement, dataUrl) {
   checkBtn.onclick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    // Open C2PA Content Credentials verifier (the most useful public checker)
+    // Auto-save image to downloads, then open C2PA Content Credentials verifier
     chrome.runtime.sendMessage({
-      action: 'openChecker',
-      url: 'https://contentcredentials.org/verify'
+      action: 'downloadAndOpenChecker',
+      imageUrl: sourceImageUrl,
+      checkerUrl: 'https://contentcredentials.org/verify'
     });
   };
 

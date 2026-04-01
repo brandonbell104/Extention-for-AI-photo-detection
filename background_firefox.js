@@ -18,6 +18,36 @@ browser.runtime.onMessage.addListener((request, sender) => {
     return;
   }
 
+  if (request.action === 'downloadAndOpenChecker') {
+    const imageUrl = request.imageUrl;
+    const checkerUrl = request.checkerUrl;
+
+    if (imageUrl && imageUrl !== '(screen capture)') {
+      const urlPath = new URL(imageUrl).pathname;
+      const ext = urlPath.split('.').pop().match(/^(jpg|jpeg|png|gif|webp|bmp|avif)$/i) ? urlPath.split('.').pop() : 'png';
+      const filename = `image-check.${ext}`;
+
+      browser.downloads.download({
+        url: imageUrl,
+        filename: filename,
+        saveAs: false
+      }).then(() => {
+        browser.tabs.create({ url: checkerUrl });
+      });
+    } else if (request.dataUrl) {
+      browser.downloads.download({
+        url: request.dataUrl,
+        filename: 'image-check.png',
+        saveAs: false
+      }).then(() => {
+        browser.tabs.create({ url: checkerUrl });
+      });
+    } else {
+      browser.tabs.create({ url: checkerUrl });
+    }
+    return;
+  }
+
   if (request.action === 'captureTab') {
     return browser.tabs.captureVisibleTab(null, { format: 'png' })
       .then(dataUrl => ({ dataUrl }));

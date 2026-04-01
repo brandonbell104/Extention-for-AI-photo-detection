@@ -45,6 +45,7 @@ const FILTERS_WITH_SENSITIVITY = ['noise', 'periodic', 'ela', 'gradient'];
 // Online checker services
 const CHECKER_SERVICES = {
   c2pa: { url: 'https://contentcredentials.org/verify' },
+  synthid: { url: 'https://hivemoderation.com/ai-generated-content-detection' },
   hive: { url: 'https://hivemoderation.com/ai-generated-content-detection' },
   aiornot: { url: 'https://aiornot.com' },
   illuminarty: { url: 'https://app.illuminarty.ai' },
@@ -254,11 +255,25 @@ document.getElementById('showDebug').addEventListener('change', (e) => {
 // Online checker / watermark buttons
 // ============================================================================
 
+// Services that accept file upload (auto-download helps the user)
+const DOWNLOAD_FIRST_SERVICES = ['c2pa'];
+
 function setupCheckerButton(buttonId, serviceKey) {
   const btn = document.getElementById(buttonId);
   if (!btn) return;
   btn.addEventListener('click', () => {
-    chrome.tabs.create({ url: CHECKER_SERVICES[serviceKey].url });
+    const url = CHECKER_SERVICES[serviceKey].url;
+
+    if (DOWNLOAD_FIRST_SERVICES.includes(serviceKey) && currentAnalyzedImageUrl) {
+      // Auto-save image to downloads, then open the checker
+      chrome.runtime.sendMessage({
+        action: 'downloadAndOpenChecker',
+        imageUrl: currentAnalyzedImageUrl,
+        checkerUrl: url
+      });
+    } else {
+      chrome.tabs.create({ url });
+    }
   });
 }
 
@@ -271,6 +286,7 @@ chrome.runtime.onMessage.addListener((request) => {
 });
 
 setupCheckerButton('checkC2PA', 'c2pa');
+setupCheckerButton('checkSynthID', 'synthid');
 setupCheckerButton('checkHive', 'hive');
 setupCheckerButton('checkAIOrNot', 'aiornot');
 setupCheckerButton('checkIlluminarty', 'illuminarty');
